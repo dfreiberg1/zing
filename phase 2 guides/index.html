@@ -1,0 +1,2860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 2 Raid Guides — Always Tired</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --bg:      #0d1117;
+    --bg2:     #141b24;
+    --bg3:     #1a2535;
+    --border:  #2a3f5a;
+    --gold:    #c9a84c;
+    --gold2:   #e8c96a;
+    --teal:    #3eb8c2;
+    --frost:   #5ab4e8;
+    --frost2:  #a8d8f0;
+    --nature:  #4cb87a;
+    --nature2: #8de0aa;
+    --red:     #c94c4c;
+    --purple:  #9b6bc9;
+    --water:   #2a6fa8;
+    --text:    #d4cfc8;
+    --muted:   #8a9ab0;
+    --sidebar: 230px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.7;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* ══════════════════════════════════════
+     SITE HEADER
+  ══════════════════════════════════════ */
+  .site-header {
+    background: linear-gradient(90deg, #080e18 0%, #0d1a2e 50%, #080e18 100%);
+    border-bottom: 1px solid var(--gold);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .site-title {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gold2);
+    letter-spacing: 1px;
+  }
+  .site-title span { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 10px; letter-spacing: 2px; }
+  .phase-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    padding: 4px 0;
+    text-transform: uppercase;
+  }
+  .raid-toggle {
+    display: flex;
+    gap: 6px;
+  }
+  .raid-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .raid-btn:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .raid-btn.active { border-color: var(--gold); color: var(--gold2); background: rgba(201,168,76,0.08); }
+  .raid-content { display: none; }
+  .raid-content.visible { display: flex; flex: 1; }
+
+  /* ══════════════════════════════════════
+     LAYOUT
+  ══════════════════════════════════════ */
+  .layout {
+    display: flex;
+    flex: 1;
+  }
+
+  /* ══════════════════════════════════════
+     SIDEBAR
+  ══════════════════════════════════════ */
+  .sidebar {
+    width: var(--sidebar);
+    flex-shrink: 0;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    position: sticky;
+    top: 49px;
+    height: calc(100vh - 49px);
+    overflow-y: auto;
+    padding: 20px 0;
+  }
+  .sidebar-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 0 18px 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .boss-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    text-decoration: none;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background 0.15s, border-color 0.15s;
+    font-size: 14px;
+  }
+  .boss-link:hover { background: rgba(255,255,255,0.04); }
+  .boss-link.active { border-left-color: var(--gold); background: rgba(201,168,76,0.06); }
+  .boss-link.done   { color: var(--text); }
+  .boss-link.todo   { color: var(--muted); cursor: default; }
+  .boss-link .num {
+    width: 20px;
+    height: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .boss-link.done .num { background: rgba(201,168,76,0.15); color: var(--gold); }
+  .boss-link.todo .num { background: rgba(255,255,255,0.04); color: var(--muted); }
+  .boss-link .name { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.5px; line-height: 1.3; }
+  .boss-link .soon { font-size: 9px; letter-spacing: 1px; color: var(--muted); display: block; margin-top: 1px; text-transform: uppercase; }
+
+  /* ══════════════════════════════════════
+     MAIN CONTENT
+  ══════════════════════════════════════ */
+  .main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ══════════════════════════════════════
+     BOSS SECTION
+  ══════════════════════════════════════ */
+  .boss-section {
+    border-bottom: 2px solid var(--border);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: stretch;
+    min-height: 200px;
+  }
+  .hero.hydross { background: linear-gradient(160deg, #0d1e2e 0%, #0d2e1e 100%); border-bottom: 2px solid var(--frost); }
+  .hero.lurker  { background: linear-gradient(160deg, #0d1a2e 0%, #0a1a2a 100%); border-bottom: 2px solid var(--water); }
+  .hero.vashj   { background: linear-gradient(160deg, #0d1a2e 0%, #1a0d2e 100%); border-bottom: 2px solid var(--gold); }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .hero.hydross::before { background: radial-gradient(ellipse at 30% 50%, rgba(90,180,232,0.12) 0%, transparent 60%), radial-gradient(ellipse at 80% 50%, rgba(76,184,122,0.10) 0%, transparent 60%); }
+  .hero.lurker::before  { background: radial-gradient(ellipse at 30% 50%, rgba(42,111,168,0.18) 0%, transparent 60%); }
+  .hero.vashj::before   { background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%); }
+
+  .hero-img {
+    width: 300px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    opacity: 0.85;
+  }
+  .hero-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent 55%, var(--bg) 100%);
+  }
+  .hero.hydross .hero-img::after { background: linear-gradient(to right, transparent 55%, #0d1e2e 100%); }
+  .hero.lurker  .hero-img::after { background: linear-gradient(to right, transparent 55%, #0d1a2e 100%); }
+  .hero.vashj   .hero-img::after { background: linear-gradient(to right, transparent 55%, #0d1a2e 100%); }
+
+  .hero-text {
+    flex: 1;
+    padding: 32px 36px 28px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-order {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .hero h2 {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    margin-bottom: 6px;
+    border: none;
+    padding: 0;
+    letter-spacing: 1px;
+    line-height: 1.2;
+    font-size: 30px;
+  }
+  .hero.hydross h2 { color: var(--frost2); text-shadow: 0 0 40px rgba(90,180,232,0.4); }
+  .hero.lurker  h2 { color: #7ac4e8; text-shadow: 0 0 40px rgba(42,111,168,0.5); }
+  .hero.vashj   h2 { color: var(--gold2); text-shadow: 0 0 40px rgba(201,168,76,0.4); }
+
+  .hero-sub {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    border: 1px solid;
+    text-transform: uppercase;
+  }
+  .badge.frost   { border-color: var(--frost);  color: var(--frost);  background: rgba(90,180,232,0.08); }
+  .badge.nature  { border-color: var(--nature); color: var(--nature); background: rgba(76,184,122,0.08); }
+  .badge.gold    { border-color: var(--gold);   color: var(--gold);   background: rgba(201,168,76,0.08); }
+  .badge.water   { border-color: #5ab4e8;       color: #5ab4e8;       background: rgba(42,111,168,0.10); }
+  .badge.diff    { border-color: var(--red);    color: var(--red);    background: rgba(201,76,76,0.08); }
+  .badge.fish    { border-color: var(--teal);   color: var(--teal);   background: rgba(62,184,194,0.08); }
+
+  /* ── BODY CONTENT ── */
+  .boss-body {
+    padding: 32px 36px 48px;
+    max-width: 820px;
+  }
+
+  /* ── SECTION HEADERS ── */
+  h2.sec {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gold);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin: 36px 0 16px;
+    letter-spacing: 0.5px;
+  }
+  h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin: 22px 0 8px;
+  }
+  h3.frost  { color: var(--frost); }
+  h3.nature { color: var(--nature); }
+  h3.gold   { color: var(--gold); }
+  h3.water  { color: #7ac4e8; }
+  h3.teal   { color: var(--teal); }
+
+  /* ── PHASE BLOCKS ── */
+  .phase {
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+  .phase-header {
+    padding: 12px 18px;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .phase-header .num {
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .phase-body { padding: 16px 18px; }
+
+  .ph-frost  .phase-header { background: rgba(90,180,232,0.10); border-bottom: 1px solid rgba(90,180,232,0.25); color: var(--frost2); }
+  .ph-frost  .num          { background: rgba(90,180,232,0.18); color: var(--frost2); }
+  .ph-trans  .phase-header { background: rgba(201,168,76,0.10); border-bottom: 1px solid rgba(201,168,76,0.25); color: var(--gold2); }
+  .ph-trans  .num          { background: rgba(201,168,76,0.18); color: var(--gold2); }
+  .ph-nature .phase-header { background: rgba(76,184,122,0.10); border-bottom: 1px solid rgba(76,184,122,0.25); color: var(--nature2); }
+  .ph-nature .num          { background: rgba(76,184,122,0.18); color: var(--nature2); }
+  .ph-blue   .phase-header { background: rgba(62,184,194,0.10); border-bottom: 1px solid rgba(62,184,194,0.25); color: var(--teal); }
+  .ph-blue   .num          { background: rgba(62,184,194,0.18); color: var(--teal); }
+  .ph-water  .phase-header { background: rgba(42,111,168,0.15); border-bottom: 1px solid rgba(42,111,168,0.35); color: #7ac4e8; }
+  .ph-water  .num          { background: rgba(42,111,168,0.25); color: #7ac4e8; }
+  .ph-red    .phase-header { background: rgba(201,76,76,0.10);  border-bottom: 1px solid rgba(201,76,76,0.25);  color: #e87a7a; }
+  .ph-red    .num          { background: rgba(201,76,76,0.18);  color: #e87a7a; }
+  .ph-purple .phase-header { background: rgba(155,107,201,0.10); border-bottom: 1px solid rgba(155,107,201,0.25); color: #b88ce8; }
+  .ph-purple .num          { background: rgba(155,107,201,0.18); color: #b88ce8; }
+
+  /* ── TRIGGER ── */
+  .trigger {
+    display: inline-block;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 2px 10px;
+    font-size: 12px;
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    margin-bottom: 12px;
+  }
+
+  /* ── TABLES ── */
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 18px; font-size: 15px; }
+  thead tr { background: var(--bg3); border-bottom: 1px solid var(--gold); }
+  th {
+    text-align: left; padding: 9px 13px;
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600;
+    color: var(--gold); letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  td { padding: 8px 13px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  td:first-child { font-weight: 600; white-space: nowrap; }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    border-left: 3px solid;
+    padding: 11px 15px;
+    margin: 12px 0;
+    font-size: 15px;
+    background: rgba(255,255,255,0.02);
+  }
+  .callout.warn   { border-color: var(--red);    }
+  .callout.frost  { border-color: var(--frost);  }
+  .callout.nature { border-color: var(--nature); }
+  .callout.gold   { border-color: var(--gold);   }
+  .callout.water  { border-color: #5ab4e8;       }
+  .callout.teal   { border-color: var(--teal);   }
+  .callout strong { display: block; font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
+  .callout.warn   strong { color: var(--red);    }
+  .callout.frost  strong { color: var(--frost);  }
+  .callout.nature strong { color: var(--nature); }
+  .callout.gold   strong { color: var(--gold);   }
+  .callout.water  strong { color: #7ac4e8;        }
+  .callout.teal   strong { color: var(--teal);   }
+
+  /* ── DEBUFF LADDER ── */
+  .debuff-ladder { display: flex; gap: 0; margin: 10px 0 14px; overflow: hidden; border: 1px solid var(--border); }
+  .debuff-step { flex: 1; text-align: center; padding: 7px 4px; font-family: 'Cinzel', serif; font-size: 11px; border-right: 1px solid var(--border); }
+  .debuff-step:last-child { border-right: none; }
+  .debuff-step .pct { font-size: 13px; font-weight: 700; display: block; }
+  .debuff-step .sec { font-size: 9px; color: var(--muted); display: block; }
+  .debuff-step.safe    { background: rgba(76,184,122,0.08); }
+  .debuff-step.caution { background: rgba(201,168,76,0.08); }
+  .debuff-step.swap    { background: rgba(201,76,76,0.15); }
+  .debuff-step.swap .pct { color: var(--red); }
+  .swap-label { font-size: 8px; letter-spacing: 1px; text-transform: uppercase; color: var(--red); display: block; margin-top: 1px; }
+
+  /* ── ROLE CARDS ── */
+  .roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 12px; margin-top: 8px; }
+  .role-card { background: var(--bg2); border: 1px solid var(--border); padding: 14px; }
+  .role-card h4 { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; padding-bottom: 7px; border-bottom: 1px solid var(--border); }
+  .role-card.tank   h4 { color: #6ab0e8; }
+  .role-card.melee  h4 { color: #e8a06a; }
+  .role-card.ranged h4 { color: var(--nature2); }
+  .role-card.heal   h4 { color: #b06ae8; }
+  .role-card ul { list-style: none; padding: 0; }
+  .role-card ul li { font-size: 13.5px; padding: 3px 0 3px 13px; border-bottom: 1px solid rgba(255,255,255,0.04); position: relative; }
+  .role-card ul li::before { content: '›'; position: absolute; left: 0; color: var(--muted); }
+  .role-card ul li:last-child { border-bottom: none; }
+
+  /* ── RESIST GRID ── */
+  .resist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .resist-card { border: 1px solid; padding: 14px; }
+  .resist-card.f { border-color: rgba(90,180,232,0.4); background: rgba(90,180,232,0.05); }
+  .resist-card.n { border-color: rgba(76,184,122,0.4); background: rgba(76,184,122,0.05); }
+  .resist-card h4 { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 7px; }
+  .resist-card.f h4 { color: var(--frost2); }
+  .resist-card.n h4 { color: var(--nature2); }
+  .resist-card p { font-size: 14px; color: var(--text); margin: 0; }
+
+  /* ── CORE CHAIN ── */
+  .core-chain {
+    background: var(--bg3); border: 1px solid var(--border);
+    padding: 14px 18px; margin: 12px 0; font-size: 13px;
+    font-family: 'Cinzel', serif;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .chain-step { background: rgba(201,168,76,0.10); border: 1px solid rgba(201,168,76,0.3); color: var(--gold); padding: 5px 12px; font-size: 11px; letter-spacing: 1px; }
+  .chain-arrow { color: var(--muted); font-size: 16px; }
+
+  /* ── KILL ORDER ── */
+  .kill-order { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .kill-badge { padding: 5px 12px; font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; border: 1px solid; display: flex; align-items: center; gap: 6px; }
+  .kill-badge .role-tag { font-size: 9px; opacity: 0.7; }
+  .kb-hunter { border-color: #a8cc6a; color: #a8cc6a; background: rgba(168,204,106,0.08); }
+  .kb-ranged { border-color: var(--teal); color: var(--teal); background: rgba(62,184,194,0.08); }
+  .kb-melee  { border-color: #e8a06a; color: #e8a06a; background: rgba(232,160,106,0.08); }
+  .kb-lock   { border-color: var(--purple); color: var(--purple); background: rgba(155,107,201,0.08); }
+
+  /* ── TAG ── */
+  .tag {
+    display: inline-block; font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 1px; padding: 2px 7px; border: 1px solid;
+    vertical-align: middle; margin-left: 5px; text-transform: uppercase;
+  }
+  .tag.warn   { border-color: var(--red); color: var(--red); }
+  .tag.frost  { border-color: var(--frost); color: var(--frost); }
+  .tag.nature { border-color: var(--nature); color: var(--nature); }
+
+  /* ── COMING SOON ── */
+  .coming-soon {
+    padding: 60px 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-bottom: 2px solid var(--border);
+    min-height: 200px;
+  }
+  .coming-soon .cs-num {
+    font-family: 'Cinzel', serif;
+    font-size: 48px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.04);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+  .coming-soon h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    border: none;
+    padding: 0;
+  }
+  .coming-soon p { color: var(--muted); font-size: 14px; font-style: italic; }
+
+  p { margin-bottom: 10px; }
+  ul, ol { padding-left: 20px; margin-bottom: 10px; }
+  li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+
+<!-- ══ SITE HEADER ══════════════════════════════════════════ -->
+<header class="site-header">
+  <div class="site-title">Always Tired <span>TBC CLASSIC</span></div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="phase-tag">Phase 2 Raid Guides</div>
+    <div class="raid-toggle">
+      <button class="raid-btn active" onclick="showRaid('ssc',this)">SSC</button>
+      <button class="raid-btn" onclick="showRaid('tk',this)">TK</button>
+      <button class="raid-btn" onclick="showRaid('cs',this)" style="border-color:#5a8a5a;color:#8dc88d;">Cheat Sheets</button>
+    </div>
+  </div>
+</header>
+
+<div id="ssc-content" class="raid-content visible">
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+<nav class="sidebar">
+  <div class="sidebar-label">SSC Bosses</div>
+  <a class="boss-link done" href="#ssc-trash">
+    <div class="num" style="font-size:9px;">T</div>
+    <div class="name">Trash Guide<span class="soon">Smallish's Guide</span></div>
+  </a>
+  <a class="boss-link done active" href="#hydross">
+    <div class="num">1</div>
+    <div class="name">Hydross<span class="soon">Frost / Nature</span></div>
+  </a>
+  <a class="boss-link done" href="#lurker">
+    <div class="num">2</div>
+    <div class="name">The Lurker Below<span class="soon">Fishing Required</span></div>
+  </a>
+  <a class="boss-link done" href="#leotheras">
+    <div class="num">3</div>
+    <div class="name">Leotheras<span class="soon">Human / Demon</span></div>
+  </a>
+  <a class="boss-link done" href="#karathress">
+    <div class="num">4</div>
+    <div class="name">Karathress<span class="soon">Council Fight</span></div>
+  </a>
+  <a class="boss-link done" href="#tidewalker">
+    <div class="num">5</div>
+    <div class="name">Tidewalker<span class="soon">Murloc Waves</span></div>
+  </a>
+  <a class="boss-link done" href="#vashj">
+    <div class="num">6</div>
+    <div class="name">Lady Vashj<span class="soon">Final Boss</span></div>
+  </a>
+</nav>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════ -->
+<main class="main">
+
+<!-- ════════════════════════════════════════════════════════
+     SSC TRASH GUIDE
+═════════════════════════════════════════════════════════ -->
+<section class="boss-section" id="ssc-trash">
+  <div class="hero" style="background:linear-gradient(160deg,#0a1a10 0%,#0d1a20 100%);border-bottom:2px solid var(--nature);">
+    <div class="hero-text" style="padding-left:40px;">
+      <div class="hero-order">Serpentshrine Cavern</div>
+      <h2 style="color:var(--nature2);text-shadow:0 0 40px rgba(76,184,122,0.4);">Trash Guide</h2>
+      <div class="hero-sub">Pack-by-pack breakdown — courtesy of Smallish</div>
+    </div>
+  </div>
+  <div class="boss-body">
+
+    <!-- Beast-Tamer Pack -->
+    <h2 class="sec" style="color:var(--nature);">Pack: Beast-Tamer + Hate-Screamer + Sporebat</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;align-items:start;">
+      <div style="text-align:center;">
+        <img src="smallish_imgs/p1_img1.png" style="max-width:100%;opacity:0.9;border:1px solid var(--border);">
+        <div style="font-family:'Cinzel',serif;font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:1px;">BEAST-TAMER</div>
+      </div>
+      <div style="text-align:center;">
+        <img src="smallish_imgs/p1_img2.png" style="max-width:100%;opacity:0.9;border:1px solid var(--border);">
+        <div style="font-family:'Cinzel',serif;font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:1px;">HATE-SCREAMER</div>
+      </div>
+      <div style="text-align:center;">
+        <img src="smallish_imgs/p1_img3.png" style="max-width:100%;opacity:0.9;border:1px solid var(--border);">
+        <div style="font-family:'Cinzel',serif;font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:1px;">SPOREBAT</div>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Mob</th><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Beast-Tamer</td><td>Cleave</td><td>Physical AoE in front — always tank facing away from raid.</td></tr>
+        <tr><td></td><td>Bestial Wrath</td><td>Enrages self and two Sporebats. <strong>Kill Beast-Tamer first.</strong></td></tr>
+        <tr><td>Hate-Screamer</td><td>Sonic Scream</td><td>5,000–6,000 Arcane damage on a player — heal through it.</td></tr>
+        <tr><td></td><td>Silence</td><td>Huge AoE Silence around it. Stun it or stay at range to avoid.</td></tr>
+        <tr><td>Sporebat</td><td>Charge</td><td>Stuns and strikes any target 1–30 yards. Cannot be dead-zoned — can hit anyone in range.</td></tr>
+        <tr><td></td><td>Spore Burst</td><td>1,300–1,600 Nature damage + DoT of 694–806 Nature damage.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout warn" style="margin-top:12px;">
+      <strong>Strategy</strong>
+      Polymorph or Hibernate Sporebats and Hate-Screamers. MT picks up Beast-Tamers, OT picks up everything else not CC'd. All ranged and healers stay at max distance.
+      Kill order: <strong>Beast-Tamers &rarr; Sporebats &rarr; Hate-Screamers</strong> — keep them CC'd as long as possible.
+    </div>
+
+    <!-- Underbog Colossi -->
+    <h2 class="sec" style="color:var(--nature);margin-top:32px;">Pack: Underbog Colossi (3 Variants)</h2>
+    <div style="display:flex;gap:16px;margin-bottom:16px;align-items:flex-start;">
+      <img src="smallish_imgs/p2_img1.png" style="width:160px;opacity:0.9;border:1px solid var(--border);flex-shrink:0;">
+      <div style="font-size:15px;line-height:1.7;color:var(--text);">
+        Half the battle is <strong>identifying which variant you have</strong> before the pull. Each one plays differently and the whole raid needs to know which one it is.
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Variant</th><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong style="color:var(--nature2);">A</strong></td><td>Initial Infection</td><td>Disease dealing heavy nature damage — <strong>Cleanse immediately.</strong></td></tr>
+        <tr><td></td><td>Sporequake</td><td>Channeled shake dealing constant nature damage — <strong>entire raid move out.</strong></td></tr>
+        <tr><td><strong style="color:var(--nature2);">B</strong></td><td>Serpentshrine Parasite</td><td>Debuff on random target; a Parasite spawns — call it out, ranged kill it fast.</td></tr>
+        <tr><td></td><td>Acid Geyser</td><td>Channeled at random player — target must <strong>move to turn the Colossus away from the raid.</strong> Ranged/healers stay close during this variant.</td></tr>
+        <tr><td><strong style="color:var(--nature2);">C</strong></td><td>Frenzy</td><td>Enrages; attack speed greatly increases — healers compensate for tank damage spikes.</td></tr>
+        <tr><td></td><td>Atrophic Blow</td><td>Reduces Strength and Stamina on targets hit — tanks be aware of reduced HP pool.</td></tr>
+        <tr><td>After Death</td><td>Toxic Pool / Adds / Refreshing Mist</td><td>Colossi trigger effects on death — don't stand in the pool, kill the adds, Refreshing Mist heals (good).</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Vashj'ir Honor Guard Pack -->
+    <h2 class="sec" style="color:var(--nature);margin-top:32px;">Pack: Vashj'ir Honor Guard + Coilfang Priestess + Shatterer + Technician</h2>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;align-items:start;">
+      <div style="text-align:center;">
+        <img src="smallish_imgs/p3_img1.png" style="max-width:100%;opacity:0.9;border:1px solid var(--border);">
+        <div style="font-family:'Cinzel',serif;font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:1px;">HONOR GUARD</div>
+      </div>
+      <div style="text-align:center;">
+        <img src="smallish_imgs/p3_img2.png" style="max-width:100%;opacity:0.9;border:1px solid var(--border);">
+        <div style="font-family:'Cinzel',serif;font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:1px;">PRIESTESS</div>
+      </div>
+      <div style="text-align:center;">
+        <img src="smallish_imgs/p3_img4.png" style="max-width:100%;opacity:0.9;border:1px solid var(--border);">
+        <div style="font-family:'Cinzel',serif;font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:1px;">SHATTERER</div>
+      </div>
+      <div style="text-align:center;">
+        <img src="smallish_imgs/p3_img5.png" style="max-width:100%;opacity:0.9;border:1px solid var(--border);">
+        <div style="font-family:'Cinzel',serif;font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:1px;">TECHNICIAN</div>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Mob</th><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Honor Guard</td><td>Enrage</td><td>Increases attack damage and speed.</td></tr>
+        <tr><td></td><td>Frightening Shout</td><td>Fears all raiders in melee range — <strong>Shamans drop Tremor Totem.</strong></td></tr>
+        <tr><td></td><td>Knockback</td><td>Kicks targets back 7–10 yards.</td></tr>
+        <tr><td></td><td>Mortal Cleave</td><td>Mortal Strike to all targets hit — <strong>reduces healing received.</strong></td></tr>
+        <tr><td>Coilfang Priestess</td><td>Holy Smite / Holy Fire</td><td>3,150–3,850 Holy damage; Holy Fire also applies a magic DoT.</td></tr>
+        <tr><td></td><td>Priestess Spirit</td><td><strong>On death:</strong> Spirit Healer spawns and spams Holy Nova — move enemies away from her corpse, get out of Holy Nova.</td></tr>
+        <tr><td>Coilfang Shatterer</td><td>Shatter Armor</td><td>Reduces MT armor by 50% and damage dealt by 35% for 15 seconds — healers watch for spike.</td></tr>
+        <tr><td>Greyheart Technician</td><td>Hamstring</td><td>66% slow on target.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout" style="margin-top:12px;border-left-color:var(--nature);">
+      <strong>Strategy</strong>
+      MT and OT pull pack together. Move enemies away from Priestess corpses and get out of Holy Nova. Ranged and melee cleave everything down — AoE is very effective. Shamans use Tremor Totem for Frightening Shout fears.
+    </div>
+
+    <!-- Greyheart Pack -->
+    <h2 class="sec" style="color:var(--nature);margin-top:32px;">Pack: Greyheart Tidecaller + Nether-Mage + Skulker</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;align-items:start;">
+      <div style="text-align:center;">
+        <img src="smallish_imgs/p4_img1.png" style="max-width:100%;opacity:0.9;border:1px solid var(--border);">
+        <div style="font-family:'Cinzel',serif;font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:1px;">TIDECALLER</div>
+      </div>
+      <div style="text-align:center;">
+        <img src="smallish_imgs/p4_img2.png" style="max-width:100%;opacity:0.9;border:1px solid var(--border);">
+        <div style="font-family:'Cinzel',serif;font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:1px;">NETHER-MAGE</div>
+      </div>
+      <div style="text-align:center;">
+        <img src="smallish_imgs/p4_img3.png" style="max-width:100%;opacity:0.9;border:1px solid var(--border);">
+        <div style="font-family:'Cinzel',serif;font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:1px;">SKULKER</div>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Mob</th><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Tidecaller</td><td>Water Elemental Totem</td><td>Summons a water elemental — <strong>kill the TOTEM, do NOT target the elemental.</strong></td></tr>
+        <tr><td></td><td>Poison Shield</td><td>Deals heavy nature damage on being struck — <strong>PURGE immediately</strong> (Shamans/Priests).</td></tr>
+        <tr><td></td><td>Virulent Poison</td><td>Nature DoT — healers dispel.</td></tr>
+        <tr><td>Nether-Mage</td><td>Frostbolt / Fireball / Cone of Cold / Rain of Fire / Arcane Volley</td><td>All function like player spells — interrupt and kick channeled casts.</td></tr>
+        <tr><td></td><td>Destruction Buffs</td><td>Frost/Fire/Arcane buff that massively increases damage — <strong>Purge or Mage Spellsteal immediately.</strong></td></tr>
+        <tr><td>Skulker</td><td>Kick</td><td>Interrupts spellcasting — <strong>do not cast while in melee range of a Skulker.</strong></td></tr>
+      </tbody>
+    </table>
+    <div class="callout warn" style="margin-top:12px;">
+      <strong>Kill Order</strong>
+      <strong>Tidecallers &rarr; Nether-Mages &rarr; Skulkers.</strong>
+      Kill Water Elemental Totems the instant they spawn. Purge Poison Shield every time. Dispel all poisons. Kick Nether-Mage channeled spells.
+    </div>
+
+    <!-- Serpentguard Pack -->
+    <h2 class="sec" style="color:var(--nature);margin-top:32px;">Pack: Coilfang Serpentguard + Fathom-Witch + Serpentshrine Lurker</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;align-items:start;">
+      <div style="text-align:center;">
+        <img src="smallish_imgs/p5_img1.png" style="max-width:100%;opacity:0.9;border:1px solid var(--border);">
+        <div style="font-family:'Cinzel',serif;font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:1px;">SERPENTGUARD</div>
+      </div>
+      <div style="text-align:center;">
+        <img src="smallish_imgs/p5_img2.png" style="max-width:100%;opacity:0.9;border:1px solid var(--border);">
+        <div style="font-family:'Cinzel',serif;font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:1px;">FATHOM-WITCH</div>
+      </div>
+      <div style="text-align:center;">
+        <img src="smallish_imgs/p5_img3.png" style="max-width:100%;opacity:0.9;border:1px solid var(--border);">
+        <div style="font-family:'Cinzel',serif;font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:1px;">SSC LURKER</div>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Mob</th><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Serpentguard</td><td>Spell Reflection</td><td>Reflects all spells for a short duration — stop casting when it's up.</td></tr>
+        <tr><td></td><td>Corrupt Devotion Aura</td><td>Reduces armor of all nearby raiders — spread awareness to melee.</td></tr>
+        <tr><td>Fathom-Witch</td><td>Domination</td><td>Mind Controls a player for 10 seconds — <strong>CC the target immediately.</strong> Shamans use Grounding Totem to eat it.</td></tr>
+        <tr><td></td><td>Shadow Bolt</td><td>Instant cast heavy shadow damage.</td></tr>
+        <tr><td></td><td>Shadow Nova</td><td>Damages and <strong>knocks back all nearby players — can drop them off the platform.</strong> Position tanks carefully.</td></tr>
+        <tr><td>SSC Lurker</td><td>Poison Bolt Volley</td><td>Nature damage + DoT on multiple targets.</td></tr>
+        <tr><td></td><td>Shadow Bolt</td><td>Instant cast heavy shadow damage.</td></tr>
+        <tr><td></td><td>Rancid Mushroom Primer</td><td>Summons mushrooms that grow over time — <strong>move away from them.</strong></td></tr>
+      </tbody>
+    </table>
+    <div class="callout warn" style="margin-top:12px;">
+      <strong>Kill Order</strong>
+      <strong>SSC Lurkers &rarr; Fathom-Witches &rarr; Serpentguard.</strong>
+      Position so Shadow Nova doesn't knock anyone off the platform. Shamans Grounding Totem for Mind Control. CC any MC'd players immediately.
+    </div>
+
+    <!-- Tidewalker Murlocs -->
+    <h2 class="sec" style="color:var(--nature);margin-top:32px;">Pack: Tidewalker Murlocs</h2>
+    <div style="display:flex;gap:20px;margin-bottom:16px;align-items:flex-start;">
+      <img src="smallish_imgs/p6_img1.png" style="width:140px;opacity:0.9;border:1px solid var(--border);flex-shrink:0;">
+      <div>
+        <p>These murlocs don't pose a significant threat if pulled correctly. They have several sub-types with different abilities but the strategy is the same regardless.</p>
+        <table style="margin-top:10px;">
+          <thead><tr><th>Sub-type</th><th>Ability</th></tr></thead>
+          <tbody>
+            <tr><td>Shaman</td><td>Chain Lightning</td></tr>
+            <tr><td>Depth-Seer</td><td>Healing Touch — interrupt it</td></tr>
+            <tr><td>Hydromancer</td><td>Frost Nova</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="callout" style="border-left-color:var(--nature);">
+      <strong>Strategy</strong>
+      MT and OT pull the murlocs together. Ranged and melee cleave them down — AoE is very effective. Interrupt Healing Touch from Depth-Seers.
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     BOSS 1 — HYDROSS THE UNSTABLE
+═════════════════════════════════════════════════════════ -->
+<section class="boss-section" id="hydross">
+  <div class="hero hydross">
+    <div class="hero-img">
+      <img src="Screenshot 2026-05-07 074825.png" alt="Hydross the Unstable">
+    </div>
+    <div class="hero-text">
+      <div class="hero-order">Serpentshrine Cavern — Boss 1 of 6</div>
+      <h2>Hydross the Unstable</h2>
+      <div class="hero-sub">Duke of Currents — shifts between Frost and Nature form</div>
+      <div class="badges">
+        <div class="badge frost">Frost Form</div>
+        <div class="badge nature">Nature Form</div>
+        <div class="badge diff">Resistance Gear Required</div>
+      </div>
+    </div>
+  </div>
+  <div class="boss-body">
+
+    <h2 class="sec">Overview</h2>
+    <p>Hydross alternates between two elemental forms — Frost and Nature — based on where he stands relative to the purification beams. Each form stacks a debuff on the entire raid that multiplies elemental damage taken. Raids drag Hydross between forms before the debuff gets critical, triggering a transition that spawns four Water Elemental adds and resets all threat. Two tanks with specialized resistance gear are required.</p>
+    <div class="callout gold">
+      <strong>The One Rule</strong>
+      Stop ALL damage the moment a transition is triggered — including pets, DoTs, and Searing Totems. Threat resets completely. Any hit before the new tank has aggro can chain-aggro wipe the raid.
+    </div>
+
+    <h2 class="sec">Resistance Requirements</h2>
+    <div class="resist-grid">
+      <div class="resist-card f">
+        <h4>Frost Resistance Tank</h4>
+        <p>Takes the boss on pull and after each Nature-to-Frost transition. Also picks up Pure Spawn of Hydross (Frost Elementals) during transitions.</p>
+      </div>
+      <div class="resist-card n">
+        <h4>Nature Resistance Tank</h4>
+        <p>Handles Tainted Water Elementals on the pull. Takes the boss after each Frost-to-Nature transition. Also picks up Tainted Spawn of Hydross (Nature Elementals).</p>
+      </div>
+    </div>
+
+    <h2 class="sec">Abilities</h2>
+    <table>
+      <thead><tr><th>Ability</th><th>Form</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Mark of Hydross</td><td style="color:var(--frost2)">Frost</td><td>Stacking debuff — increases Frost damage taken every 15 sec: 10% → 25% → 50% → 100% → 250% → 500%. Transition at 100%.</td></tr>
+        <tr><td>Water Tomb</td><td style="color:var(--frost2)">Frost</td><td>Targets a random player — stuns and deals Frost damage over time to all players within 8 yards. Spread at least 8 yards during Frost form.</td></tr>
+        <tr><td>Mark of Corruption</td><td style="color:var(--nature2)">Nature</td><td>Same escalation as Mark of Hydross but increases Nature damage taken. Transition at 100%.</td></tr>
+        <tr><td>Vile Sludge</td><td style="color:var(--nature2)">Nature</td><td>Targets a random player — Nature DoT and reduces damage dealt and healing taken by 50%. Does not spread. Far less dangerous than Water Tomb.</td></tr>
+        <tr><td>Summon Water Elemental</td><td>Transition</td><td>Spawns four elementals on each form swap. Pure Spawn (Frost) or Tainted Spawn (Nature) depending on the transition. Incoming resistance tank picks them all up.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="gold">Debuff Stack Reference — Transition at 100%</h3>
+    <div class="debuff-ladder">
+      <div class="debuff-step safe"><span class="pct">10%</span><span class="sec">0:15</span></div>
+      <div class="debuff-step safe"><span class="pct">25%</span><span class="sec">0:30</span></div>
+      <div class="debuff-step caution"><span class="pct">50%</span><span class="sec">0:45</span></div>
+      <div class="debuff-step swap"><span class="pct">100%</span><span class="sec">1:00</span><span class="swap-label">Swap now</span></div>
+      <div class="debuff-step swap"><span class="pct">250%</span><span class="sec">1:15</span><span class="swap-label">Too late</span></div>
+      <div class="debuff-step swap"><span class="pct">500%</span><span class="sec">1:30</span><span class="swap-label">Wipe</span></div>
+    </div>
+
+    <h2 class="sec">Phase Breakdown</h2>
+
+    <div class="phase ph-water">
+      <div class="phase-header"><div class="num">P</div>Pull — Getting the Fight Started</div>
+      <div class="phase-body">
+        <p>Approach from the right side near the Tainted Water Elementals. The Nature Resistance tank picks up these two adds and kills them while the Frost Resistance tank pulls Hydross. Do not aggro the Purified Elementals on the left — if untouched they despawn on their own. Once engaged, the conveyor belt stops.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-frost">
+      <div class="phase-header"><div class="num">1</div>Frost Form — Hold until 100% Mark of Hydross</div>
+      <div class="phase-body">
+        <div class="trigger">Active when Hydross is on the far (Frost) side of the beams</div>
+        <p>Hydross deals Frost damage and casts Water Tomb. The whole raid takes the Mark of Hydross debuff every 15 seconds. Hold until it hits 100%, then the Frost tank drags Hydross back through the beams.</p>
+        <div class="callout frost"><strong>Water Tomb</strong>Spread at least 8 yards from every other player. A cluster hit by Water Tomb will chain-stun and can kill multiple people.</div>
+      </div>
+    </div>
+
+    <div class="phase ph-trans">
+      <div class="phase-header"><div class="num">T</div>Elemental Transition — Stop all damage, kill adds, rebuild threat</div>
+      <div class="phase-body">
+        <div class="callout warn"><strong>All Damage Stops Immediately</strong>Everyone stops attacking — melee, ranged, DoTs, pets, Searing Totems. Any damage before the new tank has threat can wipe the raid.</div>
+        <p>Four Water Elementals spawn. The incoming resistance tank picks up the boss and all four adds. The raid kills the adds before returning to the boss to give the tank time to build threat. Warlocks Banish an add if the tank is struggling. Hunters use Misdirection on the incoming tank.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-nature">
+      <div class="phase-header"><div class="num">2</div>Nature Form — Hold until 100% Mark of Corruption</div>
+      <div class="phase-body">
+        <div class="trigger">Active when Hydross is on the near (Nature) side of the beams</div>
+        <p>Nature damage and Vile Sludge. Positioning is relaxed here — no spread required. Vile Sludge targets need prompt heals. Hold until Mark of Corruption hits 100%, then transition back to Frost. Repeat until dead.</p>
+        <div class="callout nature"><strong>Vile Sludge</strong>One or two healers can manage this. The 50% healing reduction means the target needs attention, but it is not a raid-wide threat.</div>
+      </div>
+    </div>
+
+    <h2 class="sec">Role Notes</h2>
+    <div class="roles">
+      <div class="role-card tank">
+        <h4>Tanks</h4>
+        <ul>
+          <li>Two main tanks — full Frost Resist and full Nature Resist</li>
+          <li>Have backup off-tanks ready for add control during transitions</li>
+          <li>Call transitions clearly so the raid stops damage</li>
+          <li>Incoming tank: get into position before the drag so you grab immediately</li>
+          <li>Warlocks can Banish adds to help if you're overwhelmed</li>
+        </ul>
+      </div>
+      <div class="role-card melee">
+        <h4>Melee DPS</h4>
+        <ul>
+          <li>Stop all damage the instant a transition is called</li>
+          <li>Kill elemental adds before touching the boss after any transition</li>
+          <li>Spread 8 yards from others during Frost form</li>
+        </ul>
+      </div>
+      <div class="role-card ranged">
+        <h4>Ranged DPS</h4>
+        <ul>
+          <li>Stop all damage on transition calls, including DoTs</li>
+          <li>Kill adds before the boss after transitions</li>
+          <li>Hunters: Misdirection on incoming tank during transitions</li>
+          <li>Warlocks: Banish adds if tank needs help</li>
+          <li>Spread 8 yards during Frost form</li>
+        </ul>
+      </div>
+      <div class="role-card heal">
+        <h4>Healers</h4>
+        <ul>
+          <li>Save cooldowns for transitions — four adds on the new tank is a damage spike</li>
+          <li>Spot-heal Water Tomb targets promptly</li>
+          <li>Spread 8 yards during Frost form</li>
+          <li>Nature form is easier — focus on Vile Sludge targets</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     BOSS 2 — THE LURKER BELOW
+═════════════════════════════════════════════════════════ -->
+<section class="boss-section" id="lurker">
+  <div class="hero lurker">
+    <div class="hero-img">
+      <img src="Screenshot 2026-05-07 075217.png" alt="The Lurker Below">
+    </div>
+    <div class="hero-text">
+      <div class="hero-order">Serpentshrine Cavern — Boss 2 of 6</div>
+      <h2>The Lurker Below</h2>
+      <div class="hero-sub">Hidden encounter — must be fished from the waters below the platforms</div>
+      <div class="badges">
+        <div class="badge fish">300 Fishing Required</div>
+        <div class="badge water">Jump Mechanic</div>
+        <div class="badge diff">Boil Water First</div>
+      </div>
+    </div>
+  </div>
+  <div class="boss-body">
+
+    <h2 class="sec">Overview</h2>
+    <p>The Lurker Below is a two-phase alternating fight. Phase 1 is a tank-and-spank with a jump mechanic (Spout). Phase 2 is a short add phase while the boss submerges. The fight cycles between these two phases until the boss is dead. The key mechanic is jumping into the water to dodge Spout — but the water deals Scalding Water damage each time you enter it, so do not spam jump.</p>
+    <div class="callout warn">
+      <strong>Boil the Water First</strong>
+      Clear all six platforms above the boss spawn before fishing him up. This kills the Coilfang Frenzy piranhas in the water below. Without boiled water, the fish will shred anyone who jumps in during Spout. Do not skip this.
+    </div>
+    <div class="callout water">
+      <strong>Scalding Water</strong>
+      The boiled water deals damage each time you enter it and each time you jump while submerged. Jump in to dodge Spout, then get out. Do not spam jump in the water or you will kill yourself.
+    </div>
+
+    <h2 class="sec">Before the Pull</h2>
+    <p>After clearing all six platforms, assign positions:</p>
+    <ul>
+      <li>Hunters, Warlocks, and Mages split across the three small outer platforms — they will handle Coilfang Ambushers during Phase 2 submerge.</li>
+      <li>Everyone else spreads evenly on the large central platform.</li>
+      <li>One raid member with 300+ Fishing fishes up the boss from the central water. This triggers the encounter.</li>
+    </ul>
+
+    <h2 class="sec">Abilities</h2>
+    <table>
+      <thead><tr><th>Ability</th><th>Phase</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Geyser</td><td>Phase 1</td><td>Targets a random player — 10-yard AoE knockback. Spread out across the large platform so Geysers don't hit clusters.</td></tr>
+        <tr><td>Whirl</td><td>Phase 1</td><td>Physical damage and knockback to all players in melee range. Tank is the primary target. Melee may get clipped.</td></tr>
+        <tr><td>Spout</td><td>Phase 1</td><td>Rotating water beam from the boss's mouth. Deals massive damage. Jump into the water when it turns toward you, get out when it passes. Can be ignored with Ice Block or Divine Shield.</td></tr>
+        <tr><td>Water Bolt</td><td>Phase 1</td><td>One-shot damage to a random raid member — only casts if nobody is in melee range. Keep the tank on the boss at all times.</td></tr>
+        <tr><td>Coilfang Ambusher</td><td>Phase 2</td><td>Spawn on small outer platforms. CC them immediately. If they aggro a healer they can kill them quickly.</td></tr>
+        <tr><td>Coilfang Guardian</td><td>Phase 2</td><td>Spawn on the large platform. Dangerous cleave — off-tanks pick up and face away from the raid. Can be stunned.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">Phase Breakdown</h2>
+
+    <div class="phase ph-blue">
+      <div class="phase-header"><div class="num">1</div>Phase 1 — Boss above water (2 minutes)</div>
+      <div class="phase-body">
+        <div class="trigger">Lasts 2 minutes, then boss submerges</div>
+        <p>Tank stands at the edge of the large platform, staying in melee range to prevent Water Bolt. Melee DPS attacks normally. Spread out to reduce Geyser overlap.</p>
+        <p>When Spout begins, watch which direction the beam is rotating. Continue damaging the boss until Spout turns toward you, then jump into the water. Get out immediately after it passes. Players with Ice Block or Divine Shield can ignore Spout entirely.</p>
+        <div class="callout water"><strong>Spout Timing</strong>Don't jump early — you take Scalding Water damage every entry. Wait until Spout is actually turning toward you, dodge it, and get back up immediately.</div>
+        <p>Note: Lurker only looks at the melee threat table during Phase 1. Ranged DPS will not pull aggro.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-water">
+      <div class="phase-header"><div class="num">2</div>Phase 2 — Boss submerged (1 minute)</div>
+      <div class="phase-body">
+        <div class="trigger">Lasts 1 minute, then boss emerges with Whirl + Spout + Whirl</div>
+        <div class="kill-order">
+          <div class="kill-badge kb-melee">Coilfang Guardians <span class="role-tag">Melee + Off-Tank</span></div>
+          <div class="kill-badge kb-ranged">Guardians (assist) <span class="role-tag">Ranged on small platforms</span></div>
+          <div class="kill-badge kb-hunter">CC Ambushers <span class="role-tag">Hunter / Warlock / Mage</span></div>
+        </div>
+        <p>Coilfang Ambushers spawn on the small outer platforms. CC them immediately — Hunters trap, Warlocks banish, Mages sheep. Once CC'd, ranged on the small platforms help kill Coilfang Guardians on the large platform. Once Guardians are dead, melee jumps to small platforms to kill the Ambushers.</p>
+        <div class="callout warn"><strong>Emergence Sequence</strong>When the Lurker comes back up he immediately casts Whirl, then Spout, then Whirl. The large platform gets dangerous fast. Be ready to jump in the water the moment he surfaces. Get back out once the sequence ends and resume Phase 1.</div>
+      </div>
+    </div>
+
+    <h2 class="sec">Role Notes</h2>
+    <div class="roles">
+      <div class="role-card tank">
+        <h4>Tanks</h4>
+        <ul>
+          <li>Main tank stays at the platform edge in melee range to prevent Water Bolt</li>
+          <li>Intercept back to the boss immediately if Whirl knocks you back</li>
+          <li>Off-tanks: pick up Coilfang Guardians during Phase 2 and face them away from the raid</li>
+          <li>Jump in water to dodge Spout — don't spam jump</li>
+        </ul>
+      </div>
+      <div class="role-card melee">
+        <h4>Melee DPS</h4>
+        <ul>
+          <li>Spread out on the large platform to minimize Geyser overlap</li>
+          <li>Phase 2: focus Coilfang Guardians first, then jump to small platforms for Ambushers</li>
+          <li>You can avoid Spout by continuously moving behind the boss during the cast</li>
+        </ul>
+      </div>
+      <div class="role-card ranged">
+        <h4>Ranged DPS</h4>
+        <ul>
+          <li>Hunters / Warlocks / Mages: be on small platforms and ready to CC Ambushers the moment Phase 2 starts</li>
+          <li>After CCing Ambushers, assist in burning Guardians on the large platform</li>
+          <li>Jump in water to dodge Spout — don't spam jump</li>
+        </ul>
+      </div>
+      <div class="role-card heal">
+        <h4>Healers</h4>
+        <ul>
+          <li>Phase 1 is relatively easy — spot heal Geyser targets</li>
+          <li>Phase 2 gets very hectic if adds aren't handled quickly — especially at emergence</li>
+          <li>Jump in water to dodge Spout — don't spam jump</li>
+          <li>If Ambushers are loose and hit a healer, call it immediately</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     BOSS 3 — LEOTHERAS THE BLIND
+═════════════════════════════════════════════════════════ -->
+<section class="boss-section" id="leotheras">
+  <div class="hero" style="background: linear-gradient(160deg, #1a0d0d 0%, #2a0d1a 100%); border-bottom: 2px solid #c94c4c;">
+    <div class="hero-img">
+      <img src="Screenshot 2026-05-07 075534.png" alt="Leotheras the Blind">
+    </div>
+    <div class="hero-text">
+      <div class="hero-order">Serpentshrine Cavern — Boss 3 of 6</div>
+      <h2 style="color:#e87a7a; text-shadow: 0 0 40px rgba(201,76,76,0.5);">Leotheras the Blind</h2>
+      <div class="hero-sub">Human form and Demon form — threat resets on every transition</div>
+      <div class="badges">
+        <div class="badge diff">Warlock Tank Required</div>
+        <div class="badge" style="border-color:#c94c4c;color:#e87a7a;background:rgba(201,76,76,0.08);">Inner Demons</div>
+        <div class="badge" style="border-color:#9b6bc9;color:#b88ce8;background:rgba(155,107,201,0.08);">Mind Control Risk</div>
+      </div>
+    </div>
+  </div>
+  <div class="boss-body">
+
+    <h2 class="sec">Overview</h2>
+    <p>Leotheras alternates between Human form and Demon form throughout the fight. Every transition wipes all threat completely. A Warlock tank in Fire Resistance gear is required to hold the Demon form using Searing Pain. During Demon form, up to five players will have Inner Demons spawned — if a player fails to kill their Inner Demon in time, they become permanently Mind Controlled and must be killed by the raid. At 15%, Leotheras splits into two separate bosses that must be tanked simultaneously.</p>
+
+    <div class="callout warn">
+      <strong>Inner Demon Priority</strong>
+      If you are targeted by Insidious Whisper, drop everything and kill your Inner Demon immediately. It takes priority over all other damage. If you fail, you become permanently Mind Controlled and the raid has to kill you.
+    </div>
+
+    <h2 class="sec">Before the Pull</h2>
+    <p>Clear all trash in the room — you need open space to run from Whirlwind. Assign a Warlock tank in Fire Resistance gear to hold Demon form the entire fight using Searing Pain. This Warlock needs dedicated healer support throughout.</p>
+
+    <h2 class="sec">Abilities</h2>
+    <table>
+      <thead><tr><th>Ability</th><th>Form</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Whirlwind</td><td style="color:var(--frost2)">Human</td><td>Leotheras spins and moves toward random players. Everyone runs away from the boss during Whirlwind. Applies a bleed DoT on hit. Ranged can continue attacking if it's not near them. Threat wipes at the end of each Whirlwind.</td></tr>
+        <tr><td>Chaos Blast</td><td style="color:var(--red)">Demon</td><td>Fire damage to the highest-threat target. This is why the Warlock tank uses Searing Pain — to stay at the top of the Demon form threat table.</td></tr>
+        <tr><td>Insidious Whisper</td><td style="color:var(--red)">Demon</td><td>Targets up to five random players and spawns a copy of them as an Inner Demon. Players must kill their demon immediately or become permanently Mind Controlled. Inner Demons can only be attacked by the player they belong to.</td></tr>
+        <tr><td>Split / Shadow of Leotheras</td><td style="color:var(--purple)">Phase 3</td><td>At 15% HP, Leotheras splits into Human form and Demon form as two separate bosses. Each needs its own tank. Burn Human form while the Warlock holds Demon form.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">Phase Breakdown</h2>
+
+    <div class="phase ph-frost">
+      <div class="phase-header"><div class="num">1</div>Human Form — Run from Whirlwind, stop damage at end</div>
+      <div class="phase-body">
+        <div class="trigger">Lasts at least 45 seconds, then swaps to Demon form</div>
+        <p>The main tank holds Leotheras. When Whirlwind is cast, everyone runs away from the boss — melee and ranged alike. Ranged DPS can keep attacking during Whirlwind as long as the boss isn't spinning toward them. The bleed from a Whirlwind hit needs prompt healing.</p>
+        <div class="callout warn"><strong>Threat Wipe at End of Whirlwind</strong>All threat resets when Whirlwind ends. DPS stops immediately. Give the main tank time to rebuild. Hunters use Misdirection on the tank to speed this up.</div>
+        <p>After at least 45 seconds, Leotheras transitions to Demon form. Again, all threat wipes on the swap.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-red">
+      <div class="phase-header"><div class="num">2</div>Demon Form — Warlock tank, kill Inner Demons immediately</div>
+      <div class="phase-body">
+        <div class="trigger">Lasts until Leotheras transitions back to Human form</div>
+        <p>The Warlock tank takes over, spamming Searing Pain to hold threat on Demon form. All other DPS waits for the Warlock to build a safe threat lead before attacking.</p>
+        <div class="callout warn"><strong>Insidious Whisper</strong>When Inner Demons spawn, the targeted players must stop attacking the boss and kill their own demon immediately. Failure = permanent Mind Control. Healers and tanks are especially vulnerable since they may not have enough damage output — tanks should swap to two weapons and use offensive cooldowns if targeted.</div>
+        <p>Threat resets again when Leotheras transitions back to Human form. The cycle repeats until 15%.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-purple">
+      <div class="phase-header"><div class="num">3</div>Split Phase — Burn Human form, hold Demon form</div>
+      <div class="phase-body">
+        <div class="trigger">Triggered at 15% HP — Demon form spawns at full health</div>
+        <p>Leotheras splits into two bosses. The entire raid focuses Human form and burns it down with all remaining offensive cooldowns. The Warlock tank holds the Demon form with healer support. Kill Human form before the Demon form overwhelms the Warlock tank.</p>
+        <div class="callout gold"><strong>Cooldown Timing</strong>Save Bloodlust/Heroism and major offensive cooldowns for this phase. The Demon form spawning at full health creates a hard time pressure — the faster Human form dies, the easier the split phase is.</div>
+      </div>
+    </div>
+
+    <h2 class="sec">Role Notes</h2>
+    <div class="roles">
+      <div class="role-card tank">
+        <h4>Tanks</h4>
+        <ul>
+          <li>Main tank holds Human form — rebuild threat after every Whirlwind and every form swap</li>
+          <li>Warlock tank holds Demon form with Searing Pain spam the entire fight</li>
+          <li>If targeted by Insidious Whisper, swap to two weapons and use offensive cooldowns to kill the Inner Demon</li>
+          <li>Split phase: Warlock holds Demon form while raid burns Human form</li>
+        </ul>
+      </div>
+      <div class="role-card melee">
+        <h4>Melee DPS</h4>
+        <ul>
+          <li>Run away from Leotheras the instant Whirlwind starts</li>
+          <li>Stop attacking when Whirlwind ends — wait for the tank to rebuild threat</li>
+          <li>Be patient after form swaps — threat resets every time</li>
+          <li>Kill your Inner Demon immediately if targeted — stop all other damage</li>
+        </ul>
+      </div>
+      <div class="role-card ranged">
+        <h4>Ranged DPS</h4>
+        <ul>
+          <li>You can attack during Whirlwind if the boss isn't spinning toward you</li>
+          <li>Be patient after Demon form transitions — let the Warlock build threat</li>
+          <li>Kill your Inner Demon immediately if targeted</li>
+          <li>Save major cooldowns for the split phase at 15%</li>
+        </ul>
+      </div>
+      <div class="role-card heal">
+        <h4>Healers</h4>
+        <ul>
+          <li>Spot-heal Whirlwind bleed targets — the DoT stacks up quickly on multiple people</li>
+          <li>Be careful with big heals during transitions — threat resets can send aggro to a healer instantly</li>
+          <li>Assign healers to the Warlock tank specifically during the split phase</li>
+          <li>If a healer gets Insidious Whisper, they may struggle to kill the demon — assign a DPS to assist if possible</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     BOSS 4 — FATHOM-LORD KARATHRESS
+═════════════════════════════════════════════════════════ -->
+<section class="boss-section" id="karathress">
+  <div class="hero" style="background: linear-gradient(160deg, #0d1a1a 0%, #0d2a1a 100%); border-bottom: 2px solid var(--nature);">
+    <div class="hero-img">
+      <img src="Screenshot 2026-05-07 075700.png" alt="Fathom-Lord Karathress">
+    </div>
+    <div class="hero-text">
+      <div class="hero-order">Serpentshrine Cavern — Boss 4 of 6</div>
+      <h2 style="color:var(--nature2); text-shadow: 0 0 40px rgba(76,184,122,0.5);">Fathom-Lord Karathress</h2>
+      <div class="hero-sub">Council fight — kill the three Fathom-Guards before burning the boss</div>
+      <div class="badges">
+        <div class="badge nature">4 Targets</div>
+        <div class="badge" style="border-color:#e8c96a;color:#e8c96a;background:rgba(232,201,106,0.08);">Interrupt Caribdis</div>
+        <div class="badge diff">Kill Spitfire Totem Instantly</div>
+      </div>
+    </div>
+  </div>
+  <div class="boss-body">
+
+    <h2 class="sec">Overview</h2>
+    <p>Karathress is a council-style fight. He and his three Fathom-Guards engage together, and each guard must be killed before you kill Karathress. Killing each guard grants Karathress a new ability, and if Karathress drops below 75% while any guard is alive, he gains a massive haste and cast speed buff that will almost certainly wipe the raid. Four separate tanks are needed.</p>
+
+    <div class="callout warn">
+      <strong>Spitfire Totem</strong>
+      This totem causes more wipes on this fight than anything else. The instant it spawns, everyone stops what they're doing and kills it. There are no exceptions. Missing a Spitfire Totem is a wipe.
+    </div>
+
+    <h2 class="sec">Kill Order</h2>
+    <div class="kill-order">
+      <div class="kill-badge kb-melee">1. Tidalvess <span class="role-tag">Main raid focus</span></div>
+      <div class="kill-badge kb-melee">2. Sharkkis <span class="role-tag">Cleave after Tidalvess</span></div>
+      <div class="kill-badge kb-ranged">3. Caribdis <span class="role-tag">Whole raid finishes her</span></div>
+      <div class="kill-badge kb-hunter">4. Karathress <span class="role-tag">Main tank burn</span></div>
+    </div>
+    <div class="callout gold"><strong>Blessing of the Tides</strong>If Karathress reaches 75% HP while any Fathom-Guard is alive, he gains a massive attack and cast speed buff. This is effectively a wipe mechanic. Do not let it happen — the guards must die first.</div>
+
+    <h2 class="sec">Fathom-Guard Abilities</h2>
+
+    <h3 class="nature">Fathom-Guard Tidalvess (Kill First)</h3>
+    <table>
+      <thead><tr><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Spitfire Totem</td><td style="color:var(--red);font-weight:600;">Kill immediately. Lasts 1 minute. Deals significant fire damage to 5 random players. Every time it spawns — during Tidalvess and after he dies when Karathress inherits the ability — the entire raid swaps and kills it.</td></tr>
+        <tr><td>Frost Shock</td><td>Frost damage and movement slow on the tank.</td></tr>
+        <tr><td>Earthbind Totem</td><td>Slows all nearby players. Destroy it when possible.</td></tr>
+        <tr><td>Poison Cleansing Totem</td><td>Removes a poison effect from Tidalvess periodically. Destroy it to stop it cleansing.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="nature">Fathom-Guard Sharkkis (Kill Second)</h3>
+    <table>
+      <thead><tr><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>The Beast Within</td><td>Increases all damage by 30% and pet damage by 50%. Save tank defensive cooldowns for this.</td></tr>
+        <tr><td>Summon Fathom Lurker</td><td>Elemental pet — deals melee damage and casts Knock Away (threat wipe). Explodes for ~4,000 Nature AoE damage on death. Do NOT kill it near the raid — tank it away and let it die out of range, or make sure people spread before it dies.</td></tr>
+        <tr><td>Summon Fathom Sporebat</td><td>Beast pet — melee damage and Knock Away. Cannot be CC'd. Tank it with the guard.</td></tr>
+        <tr><td>Multi-Toss</td><td>Targets a random player and up to three nearby, dealing Physical damage.</td></tr>
+        <tr><td>Leeching Throw</td><td>Drains health and mana from a random target for 12 seconds. Cannot be dispelled.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="nature">Fathom-Guard Caribdis (Isolated — Kill Third)</h3>
+    <table>
+      <thead><tr><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Healing Wave</td><td style="color:var(--red);font-weight:600;">Heals a random boss/guard for a large amount every 15 seconds. Interrupt every cast. Fast cast time — have multiple interrupters assigned. Curse of Tongues and Mind-numbing Poison slow the cast to make it easier to kick.</td></tr>
+        <tr><td>Tidal Surge</td><td>Freezes a random player and all within 10 yards for 3 seconds. Spread out to avoid chaining. Becomes Karathress's ability after Caribdis dies.</td></tr>
+        <tr><td>Summon Cyclone</td><td>Spawns roaming blue whirlwinds. They lift players and apply a cast speed debuff. Move away from them.</td></tr>
+        <tr><td>Water Bolt Volley</td><td>Instant cast — Frost damage to all nearby players.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="gold">Fathom-Lord Karathress</h3>
+    <table>
+      <thead><tr><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Cataclysmic Bolt</td><td>Targets a random player — deals 50% of their max health and briefly stuns. Healers need to be ready to top this player immediately.</td></tr>
+        <tr><td>Sear Nova</td><td>Fire damage to all players in melee range. Ranged stay out. Tank takes this.</td></tr>
+        <tr><td>Blessing of the Tides</td><td>Gained at 75% if any guard is alive — massive attack and cast speed buff. Wipe mechanic.</td></tr>
+        <tr><td>Inherited Powers</td><td>Gains Spitfire Totem from Tidalvess, The Beast Within from Sharkkis, and Tidal Surge from Caribdis as each guard dies.</td></tr>
+        <tr><td>Enrage</td><td>10-minute hard enrage — increases attack speed and damage. Kill the fight before this.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">Encounter</h2>
+
+    <div class="phase ph-water">
+      <div class="phase-header"><div class="num">S</div>Setup — Four tanks, Caribdis isolated</div>
+      <div class="phase-body">
+        <p>Assign four tanks before pulling: Main Tank on Karathress (building threat throughout), a Druid or Paladin tank on Sharkkis and his pets, an Off-Tank on Tidalvess, and a Warrior tank with a healer and interrupt team dragging Caribdis far away from the rest of the raid.</p>
+        <p>The Caribdis group's job is simple: keep her separated so her Healing Wave doesn't heal other targets easily, and interrupt every single Healing Wave cast. Assign multiple interrupters — it has a fast cast time. Curse of Tongues or Mind-numbing Poison on Caribdis makes it significantly easier to catch.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-nature">
+      <div class="phase-header"><div class="num">1</div>Kill Tidalvess — Spitfire Totem discipline</div>
+      <div class="phase-body">
+        <p>The main raid focuses Tidalvess while the Main Tank holds Karathress. Every time a Spitfire Totem spawns, every DPS in the raid swaps to it and kills it immediately — then returns to Tidalvess. No exceptions.</p>
+        <div class="callout warn"><strong>Spitfire Totem</strong>Call it out on voice. Every DPS swaps immediately. If it's allowed to pulse even a few times it will kill people and create a healing crisis. Kill it the second it appears.</div>
+        <p>Destroy Tidalvess's Poison Cleansing Totem when it spawns to prevent it from cleansing him.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-nature">
+      <div class="phase-header"><div class="num">2</div>Cleave Sharkkis — Watch the Fathom Lurker</div>
+      <div class="phase-body">
+        <p>After Tidalvess dies, the raid cleaves down Sharkkis. Karathress now has Spitfire Totem — keep killing it the instant it spawns. The Sharkkis tank picks up his summoned pets. Spore Explosion on the Fathom Lurker's death deals ~4,000 Nature AoE to nearby players — make sure the Lurker is positioned away from the raid before it dies, or everyone spreads before the kill shot.</p>
+        <div class="callout warn"><strong>Fathom Lurker Explosion</strong>Do not kill the Fathom Lurker while the raid is stacked on it. Call it out before the kill shot and spread.</div>
+        <p>Save tank defensive cooldowns for when Sharkkis or Karathress uses The Beast Within — their damage jumps significantly.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-blue">
+      <div class="phase-header"><div class="num">3</div>Kill Caribdis — Spread for Tidal Surge</div>
+      <div class="phase-body">
+        <p>Once Tidalvess and Sharkkis are dead, the whole raid converges on Caribdis. Keep spreading out — Tidal Surge freezes everyone within 10 yards of the target. Continue interrupting Healing Wave until she dies. Karathress now also has Tidal Surge after she dies.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-trans">
+      <div class="phase-header"><div class="num">4</div>Burn Karathress</div>
+      <div class="phase-body">
+        <p>All guards are dead. The Main Tank has had the entire fight to build threat on Karathress. Pop offensive cooldowns and burn. Continue killing Spitfire Totems whenever they spawn. Stay spread for Tidal Surge. Healers watch for Cataclysmic Bolt targets — the 50% max health hit needs immediate attention.</p>
+      </div>
+    </div>
+
+    <h2 class="sec">Role Notes</h2>
+    <div class="roles">
+      <div class="role-card tank">
+        <h4>Tanks</h4>
+        <ul>
+          <li>Main Tank: hold Karathress the entire fight, building threat throughout</li>
+          <li>Druid/Paladin: hold Sharkkis and pick up his summoned pets</li>
+          <li>Off-Tank: hold Tidalvess</li>
+          <li>Warrior: drag Caribdis far away from the raid with a dedicated healer</li>
+          <li>Save defensive cooldowns for The Beast Within on Sharkkis and Karathress</li>
+        </ul>
+      </div>
+      <div class="role-card melee">
+        <h4>Melee DPS</h4>
+        <ul>
+          <li>Always swap to Spitfire Totem immediately when it spawns</li>
+          <li>If assigned to interrupt Caribdis, stay alert — the cast is fast</li>
+          <li>Spread out when converging on Caribdis to avoid Tidal Surge chains</li>
+          <li>Don't kill the Fathom Lurker near the raid — call out before kill shot</li>
+        </ul>
+      </div>
+      <div class="role-card ranged">
+        <h4>Ranged DPS</h4>
+        <ul>
+          <li>Always swap to Spitfire Totem immediately when it spawns</li>
+          <li>Caribdis interrupt team: use Curse of Tongues to slow her cast speed</li>
+          <li>Stay out of melee range of Karathress (Sear Nova)</li>
+          <li>Spread out for Tidal Surge during Caribdis and Karathress phases</li>
+        </ul>
+      </div>
+      <div class="role-card heal">
+        <h4>Healers</h4>
+        <ul>
+          <li>Three or four tanks taking simultaneous damage — assign healers clearly</li>
+          <li>Dedicated healer on the Caribdis tank (Warrior isolated far away)</li>
+          <li>Spread out with the Caribdis group for Tidal Surge</li>
+          <li>Immediately top Cataclysmic Bolt targets (50% max HP hit)</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     BOSS 5 — MOROGRIM TIDEWALKER
+═════════════════════════════════════════════════════════ -->
+<section class="boss-section" id="tidewalker">
+  <div class="hero" style="background: linear-gradient(160deg, #0a1420 0%, #0d1a2e 100%); border-bottom: 2px solid #5ab4e8;">
+    <div class="hero-img">
+      <img src="Screenshot 2026-05-07 080214.png" alt="Morogrim Tidewalker">
+    </div>
+    <div class="hero-text">
+      <div class="hero-order">Serpentshrine Cavern — Boss 5 of 6</div>
+      <h2 style="color:#a8d8f0; text-shadow: 0 0 40px rgba(90,180,232,0.5);">Morogrim Tidewalker</h2>
+      <div class="hero-sub">Murloc waves on a timer — AoE tanks and threat discipline win this fight</div>
+      <div class="badges">
+        <div class="badge water">Murloc Waves</div>
+        <div class="badge frost">Watery Grave</div>
+        <div class="badge diff">AoE Tank Coordination</div>
+      </div>
+    </div>
+  </div>
+  <div class="boss-body">
+
+    <h2 class="sec">Overview</h2>
+    <p>Tidewalker is a three-phase fight that cycles between burning the boss, surviving Murloc waves, and a final burn race at 25%. The Murloc waves are the hardest part — they rush in fast, and if AoE tanks can't hold threat, the Murlocs beeline for healers and kill them. Threat discipline during Murloc waves is the difference between a clean kill and a wipe.</p>
+
+    <div class="callout warn">
+      <strong>Murloc Threat Discipline</strong>
+      Do not AoE the Murloc waves until the AoE tanks have had time to generate solid threat. If a Murloc tank gets Watery Graved mid-wave, the Murlocs will chase the nearest player with threat — which is often a healer. Give the tanks time.
+    </div>
+
+    <h2 class="sec">Before the Pull</h2>
+    <p>Position Murloc tanks and crowd controllers in the hallways and near the waterfalls before the pull — the Murlocs rush in fast from both entrances and a head start matters. Hunters pre-place Frost Traps in the entrance paths. Have Super Sapper Charges ready for snap AoE threat on Murloc groups. Position the raid behind Tidewalker near one of the pillars so Tidal Wave only hits the main tank.</p>
+
+    <h2 class="sec">Abilities</h2>
+    <table>
+      <thead><tr><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Tidal Wave</td><td>Frost damage cone in front of Tidewalker plus a 15-second melee attack speed debuff. Keep Tidewalker always facing away from the raid — only the main tank should ever be in front of him.</td></tr>
+        <tr><td>Watery Grave</td><td>Teleports 4 random players to the waterfall locations, stuns briefly, and drops them from above for fall damage. Assign 1-2 Druid healers to instantly throw HoTs on Watery Grave targets. The stun and fall damage together can kill an unhealed player quickly.</td></tr>
+        <tr><td>Earthquake</td><td>Deals damage to everyone within 50 yards and triggers a Murloc wave — two packs of six Tidewalker Lurkers rush in through both room entrances. Use bandages on yourself after Earthquake, but wait to heal others until Murloc threat is established.</td></tr>
+        <tr><td>Summon Water Globule</td><td>Triggered at 25% HP. Spawns slow-moving water bubbles at each waterfall that fixate on random players and explode for heavy damage on contact. Move Tidewalker into a corner away from the Globules and burn the boss before they reach the raid.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">Phase Breakdown</h2>
+
+    <div class="phase ph-blue">
+      <div class="phase-header"><div class="num">1</div>Phase 1 — Tank and spank between Murloc waves</div>
+      <div class="phase-body">
+        <div class="trigger">Continues until Earthquake spawns a Murloc wave</div>
+        <p>Move Tidewalker to a pillar, facing away from the raid. The entire raid positions behind the boss to both damage him and be in position to AoE Murloc waves when they arrive. The main tank is the only player who should ever be in front of Tidewalker.</p>
+        <div class="callout frost"><strong>Watery Grave</strong>When four players are teleported to the waterfalls, assigned Druid healers immediately throw Rejuvenation and Regrowth on each one. They take fall damage on landing and need fast heals. Do not let them die while the rest of the raid is busy on the boss.</div>
+        <p>Between waves, this phase is straightforward. The challenge is managing Watery Grave without pulling healer attention away from the tank for too long.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-water">
+      <div class="phase-header"><div class="num">2</div>Murloc Waves — Hold DPS, let tanks establish threat</div>
+      <div class="phase-body">
+        <div class="trigger">Triggered by Earthquake — two packs of 6 rush in from both entrances</div>
+        <p>When Earthquake hits, Murloc Lurkers charge in from both room entrances simultaneously. AoE tanks rush to intercept. Hunters fire Frost Traps in their path. Mages cast Rank 1 Blizzard to slow them without generating much threat. Everyone else waits.</p>
+        <div class="callout warn"><strong>Wait for Threat</strong>Do not AoE the Murloc packs until the tanks have had time to generate solid threat. If you AoE before threat is established, Murlocs scatter to healers. Once the tanks have threat, Warlocks use Seed of Corruption and the raid burns the packs down quickly.</div>
+        <p>If a Murloc tank gets Watery Graved mid-wave, those Murlocs will follow them to the waterfall — which is better than them running loose on healers, as long as enough threat was built before the teleport. This is exactly why threat discipline early in the wave matters.</p>
+        <p>Once the wave is cleared, return to Phase 1 and resume burning the boss.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-frost">
+      <div class="phase-header"><div class="num">3</div>25% — Water Globules, move boss to corner and burn</div>
+      <div class="phase-body">
+        <div class="trigger">Triggered when Tidewalker reaches 25% HP</div>
+        <p>Water Globules spawn at each waterfall and slowly drift toward random raid members. The main tank moves Tidewalker into a far corner of the room, away from the Globule spawn points. The raid stacks on the boss and pops Bloodlust/Heroism plus all remaining offensive cooldowns. Kill Tidewalker before the Globules drift into the raid.</p>
+        <div class="callout gold"><strong>Burn Window</strong>This is the time to use everything. Bloodlust, potions, trinkets, all of it. The Globules move slowly enough that if the raid burns hard immediately, Tidewalker dies before they become a real threat. Stalling here is how wipes happen.</div>
+      </div>
+    </div>
+
+    <h2 class="sec">Role Notes</h2>
+    <div class="roles">
+      <div class="role-card tank">
+        <h4>Tanks</h4>
+        <ul>
+          <li>Main tank: Tidewalker always faces away from the raid — never let Tidal Wave clip anyone</li>
+          <li>AoE Murloc tanks: use Super Sapper Charges for snap threat on wave arrival</li>
+          <li>Move Tidewalker to a corner at 25% to keep the raid away from Globules</li>
+          <li>If Watery Graved mid-wave, hope threat is high enough that Murlocs chase you to the waterfall instead of healers</li>
+        </ul>
+      </div>
+      <div class="role-card melee">
+        <h4>Melee DPS</h4>
+        <ul>
+          <li>Do not attack Murlocs until the AoE tanks clearly have threat</li>
+          <li>Use Heavy Netherweave Bandage on yourself after Earthquake — do not waste healer mana</li>
+          <li>Stay behind Tidewalker at all times</li>
+          <li>Pop all cooldowns at 25% for the Globule burn</li>
+        </ul>
+      </div>
+      <div class="role-card ranged">
+        <h4>Ranged DPS</h4>
+        <ul>
+          <li>Hunters: pre-place Frost Traps in Murloc entrance paths before Earthquake</li>
+          <li>Mages: Rank 1 Blizzard to slow Murlocs without threatening healers</li>
+          <li>Warlocks: Seed of Corruption once AoE tanks have established threat</li>
+          <li>Use bandages after Earthquake before healing is distributed</li>
+          <li>All cooldowns at 25% for the burn phase</li>
+        </ul>
+      </div>
+      <div class="role-card heal">
+        <h4>Healers</h4>
+        <ul>
+          <li>Assign 1-2 Druids specifically to Watery Grave targets — HoTs work perfectly for the fall damage</li>
+          <li>Do not spam-heal the raid immediately after Earthquake — wait until Murloc threat is established or you become the Murlocs' target</li>
+          <li>Raid damage after Earthquake is heavy but manageable; prioritize tanks first, then wait for AoE tank threat</li>
+          <li>Be ready to move away from Globules in Phase 3</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     BOSS 6 — LADY VASHJ
+═════════════════════════════════════════════════════════ -->
+<section class="boss-section" id="vashj">
+  <div class="hero vashj">
+    <div class="hero-text" style="padding-left:40px;">
+      <div class="hero-order">Serpentshrine Cavern — Boss 6 of 6 — Final Boss</div>
+      <h2>Lady Vashj</h2>
+      <div class="hero-sub">Three-phase encounter — Phase 2 coordination is the make-or-break moment</div>
+      <div class="badges">
+        <div class="badge diff">High Difficulty</div>
+        <div class="badge gold">Tainted Core Chain</div>
+      </div>
+    </div>
+  </div>
+  <div class="boss-body">
+
+    <h2 class="sec">Overview</h2>
+    <p>Vashj is a three-phase fight. Phase 1 and Phase 3 are pure execution. Phase 2 is a coordinated add-control phase where the raid must pass Tainted Cores between players to disable four Shield Generators. Once all generators are down, Phase 3 is a burn race against an ever-expanding poison carpet.</p>
+    <div class="callout gold"><strong>The One Thing That Wipes Raids</strong>Phase 2 Tainted Core handoffs. If your core chain breaks, a generator stays up, adds keep spawning, and healers run out of mana. Assign and practice the chain before pulling.</div>
+
+    <h2 class="sec">Before the Pull</h2>
+    <p>Spread the raid evenly around the platform before pulling. Hunters spread to the corners and outer ring for Enchanted Elemental intercept. Assign the entire Tainted Core chain now — who loots, who relays, who stands at each generator. Healers assign one per tank plus raid healers for the core group.</p>
+
+    <h2 class="sec">Abilities</h2>
+    <table>
+      <thead><tr><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Shoot</td><td>Physical damage to highest-threat target when no one is in melee range. Tank stays in melee.</td></tr>
+        <tr><td>Multi-Shot</td><td>Hits a random player and nearby targets. Spread out to reduce splash.</td></tr>
+        <tr><td>Shock Blast</td><td>Nature damage plus 5-second stun on highest-threat target. Shaman Grounding Totem can absorb this.</td></tr>
+        <tr><td>Entangle</td><td>Roots and damages all players within 15 yards. Cannot be dispelled. Removed by Blessing of Freedom, Cloak of Shadows, Druid shapeshifting, or PvP trinket.</td></tr>
+        <tr><td>Static Charge</td><td>Debuff on a random player — deals 2,000 Nature damage to everyone within 5 yards. Move away immediately if you get it.</td></tr>
+        <tr><td>Forked Lightning <span class="tag warn">P2</span></td><td>Frontal cone Nature damage during Phase 2. Position accordingly.</td></tr>
+        <tr><td>Persuasion <span class="tag warn">P2</span></td><td>Mind controls a random player for 20 seconds at 999% damage. Cannot be CC'd but can be taunted. Tanks watch for this constantly.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="gold">Phase 2 Adds</h3>
+    <table>
+      <thead><tr><th>Add</th><th>Priority</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Enchanted Elemental</td><td style="color:var(--red);font-weight:700;">Kill on sight</td><td>Runs to Vashj and gives her a permanent +5% damage stack per reach. Hunters handle these.</td></tr>
+        <tr><td>Tainted Elemental</td><td style="color:var(--gold);font-weight:700;">Kill quickly</td><td>Despawns after 15 seconds. Drops the Tainted Core. Focus fire and loot immediately.</td></tr>
+        <tr><td>Coilfang Elite</td><td>Melee target</td><td>Cleave — tanks must face away from raid and melee.</td></tr>
+        <tr><td>Coilfang Strider</td><td>Ranged/kite</td><td>Fears all players in melee range every 2 seconds. Melee ignores entirely. Kite with Warlock (Searing Pain) and Shaman (Frost Shock).</td></tr>
+        <tr><td>Toxic Sporebat <span class="tag warn">P3</span></td><td>Burn fast</td><td>Drops poison clouds. More clouds = faster platform coverage = enrage timer. Hunters and Warlocks prioritize.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">Phase Breakdown</h2>
+
+    <div class="phase ph-blue">
+      <div class="phase-header"><div class="num">1</div>100% to 70% HP — Burn and spread</div>
+      <div class="phase-body">
+        <div class="trigger">Ends when Vashj reaches 70% HP</div>
+        <p>Straightforward tank-and-spank. Manage Static Charge by running out of the group immediately when you get it. Save major offensive cooldowns for Phase 3. Healers use mana consumables now — the fight is long.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-red">
+      <div class="phase-header"><div class="num">2</div>Shield Phase — Add control and core handoffs</div>
+      <div class="phase-body">
+        <div class="trigger">Triggered at 70% HP — ends when all 4 Shield Generators are disabled</div>
+        <div class="callout warn"><strong>Enchanted Elementals</strong>Do NOT let them reach Vashj. Even 3-4 stacks of the buff makes Phase 3 unmanageable.</div>
+        <div class="kill-order">
+          <div class="kill-badge kb-hunter">Enchanted Elementals <span class="role-tag">Hunters</span></div>
+          <div class="kill-badge kb-ranged">Coilfang Striders <span class="role-tag">Ranged DPS</span></div>
+          <div class="kill-badge kb-melee">Coilfang Elites <span class="role-tag">Melee DPS</span></div>
+          <div class="kill-badge kb-lock">Kite + Slow <span class="role-tag">Warlock + Shaman</span></div>
+        </div>
+        <h3 class="gold">Tainted Core Chain</h3>
+        <div class="core-chain">
+          <div class="chain-step">Tainted Elemental dies</div>
+          <div class="chain-arrow">›</div>
+          <div class="chain-step">Player A loots core</div>
+          <div class="chain-arrow">›</div>
+          <div class="chain-step">Throws to relay player</div>
+          <div class="chain-arrow">›</div>
+          <div class="chain-step">Reaches generator player</div>
+          <div class="chain-arrow">›</div>
+          <div class="chain-step">Generator disabled</div>
+        </div>
+        <div class="callout warn"><strong>If the Core Holder Dies</strong>The core disappears. You wait for another Tainted Elemental. Core holders must be kept alive — healers prioritize them.</div>
+        <p>Tanks must taunt off Mind Controlled (Persuasion) players immediately. A healer one-shotted by a MC'd player can collapse the raid.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-purple">
+      <div class="phase-header"><div class="num">3</div>Burn Phase — Race against the poison carpet</div>
+      <div class="phase-body">
+        <div class="trigger">All 4 generators disabled — Vashj emerges and wipes threat</div>
+        <p>Vashj drops her shield. Do NOT immediately attack her — burn the remaining Phase 2 adds first so the main tank can build threat. Hunters and Warlocks burn Toxic Sporebats to slow cloud spread. Pop Bloodlust/Heroism and all remaining offensive cooldowns immediately.</p>
+        <ul>
+          <li>Main tank should be near Vashj when the 4th generator drops for proximity threat.</li>
+          <li>Hunters: Misdirection on the main tank to help establish threat fast.</li>
+          <li>Have a designated direction for the raid to slowly move as poison clouds accumulate.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 class="sec">Role Notes</h2>
+    <div class="roles">
+      <div class="role-card tank">
+        <h4>Tanks</h4>
+        <ul>
+          <li>Use Misdirection on pull to front-load threat</li>
+          <li>Off-tanks: Coilfang Elites faced away from melee in Phase 2</li>
+          <li>Taunt off Persuasion targets immediately</li>
+          <li>Main tank near Vashj when 4th generator drops</li>
+        </ul>
+      </div>
+      <div class="role-card melee">
+        <h4>Melee DPS</h4>
+        <ul>
+          <li>Stay behind Coilfang Elites — Cleave kills you</li>
+          <li>Never go near Coilfang Striders</li>
+          <li>Move out on Static Charge immediately</li>
+          <li>Kill adds at Phase 3 start before hitting Vashj</li>
+        </ul>
+      </div>
+      <div class="role-card ranged">
+        <h4>Ranged DPS</h4>
+        <ul>
+          <li>Phase 2: Coilfang Striders are your target</li>
+          <li>Move out on Static Charge immediately</li>
+          <li>Save cooldowns for Phase 3</li>
+          <li>Burn Sporebats in Phase 3 to slow cloud spread</li>
+        </ul>
+      </div>
+      <div class="role-card heal">
+        <h4>Healers</h4>
+        <ul>
+          <li>Spread evenly across the platform</li>
+          <li>Assign healers to tanks and core group</li>
+          <li>Use mana consumables early and often</li>
+          <li>Prioritize core holders in Phase 2</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</main>
+</div>
+
+</div><!-- end ssc-content -->
+
+<!-- ══════════════════════════════════════════════════════════
+     TEMPEST KEEP: THE EYE
+══════════════════════════════════════════════════════════ -->
+<div id="tk-content" class="raid-content" style="flex-direction:column;">
+
+<div style="position:relative;height:180px;overflow:hidden;border-bottom:2px solid var(--gold);flex-shrink:0;width:100%;">
+  <img src="Screenshot 2026-05-07 082626.png" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;opacity:0.6;display:block;">
+  <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(13,17,23,0.7) 0%,rgba(13,17,23,0.2) 50%,rgba(13,17,23,0.7) 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;">
+    <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:5px;color:var(--muted);text-transform:uppercase;">Phase 2 Raid</div>
+    <div style="font-family:'Cinzel',serif;font-size:32px;font-weight:700;color:var(--gold2);text-shadow:0 0 40px rgba(201,168,76,0.6);letter-spacing:2px;">Tempest Keep: The Eye</div>
+    <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;">Boss Guides — Always Tired</div>
+  </div>
+</div>
+
+<div style="display:flex;flex:1;">
+<nav class="sidebar" style="top:0;height:100vh;">
+  <div class="sidebar-label">TK — The Eye</div>
+  <a class="boss-link done active" href="#tk-trash">
+    <div class="num" style="font-size:9px;">T</div>
+    <div class="name">Trash Mobs<span class="soon">Overview</span></div>
+  </a>
+  <a class="boss-link done" href="#voidreaver">
+    <div class="num">1</div>
+    <div class="name">Void Reaver<span class="soon">Loot Reaver</span></div>
+  </a>
+  <a class="boss-link done" href="#alar">
+    <div class="num">2</div>
+    <div class="name">Al'ar<span class="soon">Phoenix God</span></div>
+  </a>
+  <a class="boss-link done" href="#solarian">
+    <div class="num">3</div>
+    <div class="name">Solarian<span class="soon">Arcane</span></div>
+  </a>
+  <a class="boss-link done" href="#kaelthas">
+    <div class="num">4</div>
+    <div class="name">Kael'thas<span class="soon">Final Boss</span></div>
+  </a>
+</nav>
+
+<main class="main">
+
+<!-- ════════════════════════════════════════════════════════
+     TRASH MOBS
+═════════════════════════════════════════════════════════ -->
+<section class="boss-section" id="tk-trash">
+  <div class="hero" style="background: linear-gradient(160deg, #1a1030 0%, #0d1a30 100%); border-bottom: 2px solid #9b6bc9; min-height:160px;">
+    <div class="hero-text" style="padding-left:40px;">
+      <div class="hero-order">Tempest Keep: The Eye</div>
+      <h2 style="color:#c8a8f0; text-shadow:0 0 40px rgba(155,107,201,0.5); font-size:26px;">Trash Mobs</h2>
+      <div class="hero-sub">Know what you're pulling before you pull it</div>
+    </div>
+  </div>
+  <div class="boss-body">
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">
+      <img src="Screenshot 2026-05-07 081704.png" style="width:100%;display:block;opacity:0.85;">
+      <img src="Screenshot 2026-05-07 081825.png" style="width:100%;display:block;opacity:0.85;">
+      <img src="Screenshot 2026-05-07 081901.png" style="width:100%;display:block;opacity:0.85;">
+    </div>
+
+    <h2 class="sec">Astromancer + Star Scryer Packs</h2>
+    <div class="callout warn"><strong>Kill Order</strong>Astromancer and Star Scryer die first — every time. The Astromancer deals fire AoE and the Star Scryer will Mind Control a raid member if left up. CC the MC'd player immediately and kill these two before anything else in the pack.</div>
+    <table>
+      <thead><tr><th>Mob</th><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Astromancer</td><td>Molten Armor</td><td>Deals fire damage to anyone who attacks. Purge it immediately.</td></tr>
+        <tr><td></td><td>Blast Wave</td><td>Fire AoE with a slow. Spread out or move through it.</td></tr>
+        <tr><td></td><td>Fireball Volley</td><td>Instant cast fire AoE to all nearby. Kill this mob fast.</td></tr>
+        <tr><td>Star Scryer</td><td>Domination</td><td>Mind Controls a raid member. CC the target immediately. Kill the Star Scryer first.</td></tr>
+        <tr><td></td><td>Arcane Blast</td><td>Arcane damage and knockback on the tank. Keep back against a wall.</td></tr>
+        <tr><td></td><td>Starfall</td><td>Instant cast arcane AoE to all nearby.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">Bloodwarder Marshal Patrol</h2>
+    <p>One Bloodwarder Marshal with two Bloodwarder Squires nearby. The Squires cast Cleanse and Heal — interrupt both. Keep the Marshal facing a wall to prevent Uppercut knockback from being an issue for the tank.</p>
+    <table>
+      <thead><tr><th>Mob</th><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Marshal</td><td>Whirlwind</td><td>Physical AoE to nearby players. Step out during spin.</td></tr>
+        <tr><td></td><td>Bloodthirst</td><td>Heals the Marshal slightly. Not a major concern.</td></tr>
+        <tr><td></td><td>Uppercut</td><td>Knocks tank back. Keep Marshal against a wall.</td></tr>
+        <tr><td>Squire</td><td>Cleanse / Heal</td><td>Interrupt both constantly. Do not let them heal the Marshal.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">Al'ar's Room — Phoenix-Hawk Packs</h2>
+    <p>Pull these into the hallway before entering Al'ar's room. Each pack has Tempest Falconers and Phoenix-Hawk Hatchlings. Phoenix-Hawks should be tanked in a hallway corner to contain Wing Buffet knockback. The AoE Silence from Hatchlings affects spellcasters — casters stay back.</p>
+    <table>
+      <thead><tr><th>Mob</th><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Hatchling</td><td>Silence</td><td>6-second AoE Silence. Spellcasters stay at range.</td></tr>
+        <tr><td></td><td>Wing Buffet</td><td>Knockback. Tank in a corner.</td></tr>
+        <tr><td>Phoenix-Hawk</td><td>Dive</td><td>Charges the furthest player and knocks back nearby players. Stack up so no one is far away and isolated.</td></tr>
+        <tr><td></td><td>Mana Burn</td><td>AoE mana steal and damage to all players with mana in range. Pull only one or two at a time. The mana loss is manageable in small pulls.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">Crystalcore Packs</h2>
+    <div class="callout warn"><strong>Crystalcore Mechanic</strong>These are Demons — Warlocks Banish them. Kill them last in any pack. Their Recharge channel heals nearby Crystalcore Golems, so kill Golems first and then let the Mechanic out of Banish.</div>
+    <table>
+      <thead><tr><th>Mob</th><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Devastator</td><td>Countercharge</td><td>Adds Arcane damage to auto attacks and silences nearby. Melee stays behind. Raid at max range.</td></tr>
+        <tr><td></td><td>Knock Away</td><td>Knocks the tank back and resets threat. Tank faces a corner.</td></tr>
+        <tr><td>Sentinel</td><td>Charged Arcane Explosion / Trample</td><td>AoE damage to melee range targets. Melee stays behind. Ranged stays at max range.</td></tr>
+        <tr><td></td><td>Overcharge</td><td>Massive burst Arcane damage on the highest-threat tank. Second tank taunts immediately or healers burst-heal the tank.</td></tr>
+        <tr><td>Mechanic</td><td>Saw Blade</td><td>Physical damage and bleed to random players.</td></tr>
+        <tr><td></td><td>Recharge</td><td>Channels a heal to a nearby Golem. Banish Mechanics until Golems are dead.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">Tempest-Smith</h2>
+    <p>Tempest-Smiths can be Mind Controlled by a Priest and used against the enemy. Mind Control them and keep them CC'd until any nearby Crystalcore Golems are dead. Their Power Up ability increases a Golem's damage by 50% while channeled — never let this go off.</p>
+    <table>
+      <thead><tr><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Power Up</td><td>Channels +50% damage buff onto a Crystalcore Golem. Mind Control or CC the Tempest-Smith to prevent this.</td></tr>
+        <tr><td>Golem Repair</td><td>Heals a nearby Golem. Kill Golems first.</td></tr>
+        <tr><td>Fragmentation Bomb</td><td>Fire damage plus armor reduction debuff on targets hit.</td></tr>
+        <tr><td>Shell Shock</td><td>Fire damage and stun AoE.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">Crimson Hand Packs</h2>
+    <p>Main Tank faces all mobs against the wall and holds threat on the entire group. Once threat is established, AoE them down. Healers dispel Hammer of Justice from the Blood Knight. The Frostbolt Volley, Blizzard, and Arcane Flurry from the Battle Mage and Centurion cannot be interrupted normally — Polymorph or Gouge can stop the cast before it goes off.</p>
+    <table>
+      <thead><tr><th>Mob</th><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Blood Knight</td><td>Flash of Light</td><td>Uninterruptable heal. Burn this mob down quickly.</td></tr>
+        <tr><td></td><td>Hammer of Justice</td><td>Stun on a target. Healers dispel it.</td></tr>
+        <tr><td></td><td>Renew</td><td>HoT on a target. Purge it.</td></tr>
+        <tr><td>Battle Mage</td><td>Frostbolt Volley</td><td>Frost AoE to all raid members. Polymorph or Gouge to stop the cast.</td></tr>
+        <tr><td></td><td>Blizzard</td><td>Move out of it.</td></tr>
+        <tr><td></td><td>Cone of Cold</td><td>Frost cone — tank keeps Battle Mage facing a wall.</td></tr>
+        <tr><td>Centurion</td><td>Arcane Flurry</td><td>Massive damage to a random target. Polymorph or Gouge to stop the cast.</td></tr>
+      </tbody>
+    </table>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     BOSS 1 — VOID REAVER
+═════════════════════════════════════════════════════════ -->
+<section class="boss-section" id="voidreaver">
+  <div class="hero" style="background: linear-gradient(160deg, #150d2e 0%, #1a0d2a 100%); border-bottom: 2px solid #9b6bc9;">
+    <div class="hero-img">
+      <img src="Screenshot 2026-05-07 082315.png" alt="Void Reaver">
+    </div>
+    <div class="hero-text">
+      <div class="hero-order">Tempest Keep: The Eye — Boss 1 of 4</div>
+      <h2 style="color:#c8a8f0; text-shadow:0 0 40px rgba(155,107,201,0.5);">Void Reaver</h2>
+      <div class="hero-sub">Also known as Loot Reaver — single phase, all about threat and orb dodging</div>
+      <div class="badges">
+        <div class="badge" style="border-color:#9b6bc9;color:#c8a8f0;background:rgba(155,107,201,0.08);">Knock Away</div>
+        <div class="badge" style="border-color:#9b6bc9;color:#c8a8f0;background:rgba(155,107,201,0.08);">Arcane Orb Dodge</div>
+        <div class="badge diff">10 Min Enrage</div>
+      </div>
+    </div>
+  </div>
+  <div class="boss-body">
+
+    <h2 class="sec">Overview</h2>
+    <p>Void Reaver is a single-phase fight with no new mechanics introduced at any point. The entire fight revolves around multiple tanks building as much threat as possible because Knock Away periodically punts the current tank and wipes a significant portion of their aggro. Melee takes constant AoE damage from Pounding. Ranged spreads out in small groups to manage Arcane Orb. That's the whole fight.</p>
+
+    <h2 class="sec">Abilities</h2>
+    <table>
+      <thead><tr><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Arcane Orb</td><td>Shoots toward a random player outside of melee range. Slow travel speed — plenty of time to move. Deals Arcane damage and silences for 6 seconds on impact. The targeted player runs away from their group so the orb doesn't hit anyone else.</td></tr>
+        <tr><td>Pounding</td><td>Channeled AoE Arcane damage to all players near Void Reaver. Short cooldown — goes off many times throughout the fight. This is why melee healers need to be on top of the melee group constantly.</td></tr>
+        <tr><td>Knock Away</td><td>Punts the player with the most threat backward and reduces their aggro significantly. The next highest-threat player immediately takes over. Three to four tanks are recommended so there is always someone with enough threat to pick up when a Knock Away hits.</td></tr>
+        <tr><td>Enrage</td><td>10-minute timer. Kill the boss before it expires.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">Strategy</h2>
+    <p>Tank Void Reaver in the very center of the room to give ranged players maximum space around the edges. Assign positions around the room for ranged groups of two or three — this limits how many people get caught when an Arcane Orb comes toward a group.</p>
+    <p>Three or four tanks are needed. All of them build threat simultaneously throughout the fight. Warrior tanks swap to dual wield when they are not the active tank to generate threat faster, then swap back to shield when Knock Away hits someone else and it's their turn to hold the boss. Hunters keep a Misdirection rotation on the tanks to help re-establish threat after each Knock Away.</p>
+    <div class="callout warn"><strong>Pounding on Melee</strong>Melee takes significant damage every time Pounding goes off, and it goes off constantly. Shaman Chain Heal keeps melee alive here. Healthstones are a backup. Melee should use Heavy Netherweave Bandages whenever they get a free moment.</div>
+    <p>DPS players need to watch threat carefully and not overtake multiple tanks at once. If two tanks both just got Knock Away'd and are rebuilding threat, a DPS pulling aggro at that moment is a wipe.</p>
+
+    <h2 class="sec">Role Notes</h2>
+    <div class="roles">
+      <div class="role-card tank">
+        <h4>Tanks</h4>
+        <ul>
+          <li>3-4 tanks all building threat simultaneously throughout the fight</li>
+          <li>Warriors: dual wield when not actively tanking, swap to shield when you pick up</li>
+          <li>Tank boss in center of room</li>
+          <li>Call for Misdirection after Knock Away to re-establish threat quickly</li>
+        </ul>
+      </div>
+      <div class="role-card melee">
+        <h4>Melee DPS</h4>
+        <ul>
+          <li>Watch threat — do not overtake multiple tanks at once</li>
+          <li>Expect constant Pounding damage — stay on top of Healthstones and bandages</li>
+          <li>If targeted by Arcane Orb, run away from the melee cluster</li>
+        </ul>
+      </div>
+      <div class="role-card ranged">
+        <h4>Ranged DPS</h4>
+        <ul>
+          <li>Spread into assigned groups of 2-3 around the room perimeter</li>
+          <li>If Arcane Orb comes toward your group, run away — do not let it hit your group</li>
+          <li>Hunters: Misdirection rotation on tanks throughout, especially after Knock Away</li>
+          <li>Watch threat — tanks lose aggro periodically and need time to rebuild</li>
+        </ul>
+      </div>
+      <div class="role-card heal">
+        <h4>Healers</h4>
+        <ul>
+          <li>Shaman Chain Heal on the melee group for Pounding — it goes off very frequently</li>
+          <li>Spread with ranged groups and be ready to dodge Arcane Orbs</li>
+          <li>Shift tank healing when a new tank picks up after Knock Away</li>
+          <li>Spot heal Arcane Orb targets if they take a hit before dodging</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     BOSS 2 — AL'AR
+═════════════════════════════════════════════════════════ -->
+<section class="boss-section" id="alar">
+  <div class="hero" style="background: linear-gradient(160deg, #2a1000 0%, #1a0a00 100%); border-bottom: 2px solid #e8a06a;">
+    <div class="hero-img">
+      <img src="Screenshot 2026-05-07 082119.png" alt="Al'ar">
+    </div>
+    <div class="hero-text">
+      <div class="hero-order">Tempest Keep: The Eye — Boss 2 of 4</div>
+      <h2 style="color:#f0c080; text-shadow:0 0 40px rgba(232,160,106,0.6);">Al'ar</h2>
+      <div class="hero-sub">Two-phase Phoenix encounter — platform positioning in Phase 1, tank swaps in Phase 2</div>
+      <div class="badges">
+        <div class="badge" style="border-color:#e8a06a;color:#f0c080;background:rgba(232,160,106,0.08);">Platform Positioning</div>
+        <div class="badge" style="border-color:#e8a06a;color:#f0c080;background:rgba(232,160,106,0.08);">Melt Armor Swap</div>
+        <div class="badge diff">10 Min Berserk</div>
+      </div>
+    </div>
+  </div>
+  <div class="boss-body">
+
+    <h2 class="sec">Overview</h2>
+    <p>Al'ar is a two-phase fight. Phase 1 is a positioning and movement fight across six platforms — tanks must be pre-positioned at each landing spot and jump down during Flame Quills. Phase 2 brings Al'ar to the center of the room for a tank-swap fight with Ember adds, Flame Patches to avoid, and a hard 10-minute Berserk timer. The fight ends when Al'ar dies in Phase 2.</p>
+
+    <h2 class="sec">Abilities</h2>
+    <h3 style="color:#f0c080;">Phase 1</h3>
+    <table>
+      <thead><tr><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Ember of Al'ar</td><td>Each time Al'ar moves to a non-adjacent platform, a Phoenix add spawns. Off-tank grabs it immediately and drags it away from the raid — melee kill it away from the group because it explodes on death. Does not spawn on adjacent platform moves.</td></tr>
+        <tr><td>Flame Buffet</td><td>Only triggers if nobody is in melee range while Al'ar is on a platform. Deals fire damage and stacks a debuff increasing fire damage taken. If this goes off multiple times the raid will wipe. Always have a tank on the platform Al'ar lands on.</td></tr>
+        <tr><td>Flame Quills</td><td>Instead of flying to a new platform, Al'ar flies to the center and shoots Flame Quills at anyone on a platform. All players on platforms must jump off immediately. Tanks head to the ramps and get back into position for the next landing.</td></tr>
+        <tr><td>Ember Blast</td><td>Al'ar dies at the end of Phase 1 and casts Ember Blast — fire damage and knockback. This is the transition into Phase 2.</td></tr>
+      </tbody>
+    </table>
+    <h3 style="color:#f0c080;">Phase 2</h3>
+    <table>
+      <thead><tr><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Rebirth</td><td>Al'ar respawns in the center of the room at the start of Phase 2 — fire damage and knockback on the whole raid.</td></tr>
+        <tr><td>Melt Armor</td><td>Reduces the main tank's armor by 80%. The tank will die very quickly while holding aggro with this debuff. Al'ar is tauntable — swap immediately when this goes out.</td></tr>
+        <tr><td>Dive Bomb</td><td>Al'ar flies into the air and crashes down on a random player — massive fire damage split among all players in a small radius. Stack up when this happens so the damage is spread across the whole raid. Two Ember of Al'ar adds also spawn after each Dive Bomb — tank them away from the boss.</td></tr>
+        <tr><td>Flame Patch</td><td>Spawns a persistent fire patch on the ground. Don't stand in it. It applies a debuff increasing fire damage taken.</td></tr>
+        <tr><td>Charge</td><td>Al'ar charges a random player and immediately casts Flame Buffet. Raid healers cover this damage.</td></tr>
+        <tr><td>Berserk</td><td>10 minutes after Phase 2 begins. Kills the raid. Kill Al'ar before the timer expires.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">Phase Breakdown</h2>
+
+    <div class="phase ph-trans">
+      <div class="phase-header"><div class="num">1</div>Phase 1 — Platform rotation, kill Embers, jump for Quills</div>
+      <div class="phase-body">
+        <div class="trigger">Ends when Al'ar reaches 0% HP and casts Ember Blast</div>
+        <p>Three tanks spread across the six platform locations before the pull. Al'ar lands on one platform and moves in a clockwise rotation — have a tank pre-positioned at the next platform before he lands. If no tank is in melee range when he lands, Flame Buffet begins and will quickly wipe the raid.</p>
+        <div class="callout warn"><strong>Flame Quills</strong>When Al'ar flies to the center instead of a platform, everyone on a platform jumps down immediately. Tanks head to the ramps to reposition for the next landing.</div>
+        <p>Ranged DPS stands in the center of the room and damages the boss continuously through Phase 1 — threat is not an issue while Al'ar is on a platform. Melee positions near the ramps and bottom of each platform to intercept Ember adds.</p>
+        <p>When an Ember spawns, an off-tank grabs it and drags it away. Melee kills it away from the raid. Move away from the Ember when it's low on health — it explodes on death.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-red">
+      <div class="phase-header"><div class="num">2</div>Phase 2 — Center tank fight, Melt Armor swaps, Dive Bomb stacking</div>
+      <div class="phase-body">
+        <div class="trigger">Begins when Al'ar casts Rebirth after dying in Phase 1</div>
+        <p>Al'ar respawns in the center of the room. Multiple tanks stay on the boss. Avoid Flame Patches on the ground at all times. When Melt Armor goes out, the off-tank taunts immediately — a tank holding Al'ar with Melt Armor will die very quickly.</p>
+        <div class="callout gold"><strong>Dive Bomb</strong>When Al'ar goes into the air, the whole raid stacks up. The damage is split among all players in the landing radius — with a full raid alive, nobody dies. Two Ember adds spawn after landing. An off-tank grabs them and drags them away while melee kills them clear of the main group.</div>
+        <p>Melee's primary job in Phase 2 is killing Ember adds from Dive Bomb. Get them away from the boss before they die so their explosion doesn't hit the raid. Ranged keeps pumping damage on Al'ar while avoiding Flame Patches and staying in position for Dive Bomb stacking.</p>
+        <div class="callout warn"><strong>10-Minute Berserk</strong>The clock starts when Phase 2 begins. Pop Bloodlust/Heroism early in Phase 2 and use offensive cooldowns aggressively. Do not stall.</div>
+      </div>
+    </div>
+
+    <h2 class="sec">Role Notes</h2>
+    <div class="roles">
+      <div class="role-card tank">
+        <h4>Tanks</h4>
+        <ul>
+          <li>Phase 1: three tanks cover six platform spots — be pre-positioned before Al'ar lands</li>
+          <li>Jump off platforms immediately during Flame Quills, reposition via ramps</li>
+          <li>Off-tank: grab Ember adds and drag them away from the raid</li>
+          <li>Phase 2: taunt immediately when Melt Armor goes out on the main tank</li>
+          <li>Tank Dive Bomb Embers away from the boss</li>
+        </ul>
+      </div>
+      <div class="role-card melee">
+        <h4>Melee DPS</h4>
+        <ul>
+          <li>Phase 1: position near ramps and bottom of platforms to intercept Ember adds</li>
+          <li>Move away from Embers before killing them — they explode on death</li>
+          <li>Phase 2: same job — kill Ember adds away from the raid</li>
+          <li>Don't stand in Flame Patch</li>
+        </ul>
+      </div>
+      <div class="role-card ranged">
+        <h4>Ranged DPS</h4>
+        <ul>
+          <li>Phase 1: stand in center, damage boss freely — no threat issues on platforms</li>
+          <li>Stack up for Dive Bomb in Phase 2</li>
+          <li>Don't stand in Flame Patch</li>
+          <li>Keep damage on Al'ar in Phase 2 while avoiding mechanics</li>
+        </ul>
+      </div>
+      <div class="role-card heal">
+        <h4>Healers</h4>
+        <ul>
+          <li>Phase 1: heal platform tanks and spot heal Ember explosion hits</li>
+          <li>Conserve mana in Phase 1 — Phase 2 is more intense</li>
+          <li>Phase 2: cover Charge hits and Dive Bomb raid damage</li>
+          <li>Be ready to burst-heal the incoming tank immediately after a Melt Armor swap</li>
+          <li>Don't stand in Flame Patch</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     BOSS 3 — HIGH ASTROMANCER SOLARIAN
+═════════════════════════════════════════════════════════ -->
+<section class="boss-section" id="solarian">
+  <div class="hero" style="background: linear-gradient(160deg, #0d1a30 0%, #150d30 100%); border-bottom: 2px solid #5ab4e8;">
+    <div class="hero-img">
+      <img src="Screenshot 2026-05-07 082340.png" alt="High Astromancer Solarian">
+    </div>
+    <div class="hero-text">
+      <div class="hero-order">Tempest Keep: The Eye — Boss 3 of 4</div>
+      <h2 style="color:#a8d8f0; text-shadow:0 0 40px rgba(90,180,232,0.5);">High Astromancer Solarian</h2>
+      <div class="hero-sub">Three phases — Wrath soakers, portal adds, then burn her as a Voidwalker</div>
+      <div class="badges">
+        <div class="badge frost">Arcane Damage</div>
+        <div class="badge" style="border-color:#9b6bc9;color:#c8a8f0;background:rgba(155,107,201,0.08);">Wrath Soakers</div>
+        <div class="badge" style="border-color:#9b6bc9;color:#c8a8f0;background:rgba(155,107,201,0.08);">Voidwalker at 20%</div>
+      </div>
+    </div>
+  </div>
+  <div class="boss-body">
+
+    <h2 class="sec">Overview</h2>
+    <p>Solarian alternates between two phases every 50 seconds — Phase 1 where she is active and casting, and Phase 2 where she disappears and portal adds spawn. At 20% she transforms into a large Voidwalker with a fear ability. The main mechanic throughout is Wrath of the Astromancer, a debuff that jumps to the nearest player after 6 seconds and dramatically increases Arcane damage taken. Raids designate two Arcane Soakers positioned away from the group to catch the bounce.</p>
+
+    <h2 class="sec">Before the Pull</h2>
+    <p>Designate two Arcane Soakers — players wearing as much Arcane Resistance as possible, positioned far away from the rest of the raid. Anyone who gets Wrath of the Astromancer runs to the soakers and lets the debuff jump to them. Soakers then run away from each other so it bounces between them instead of the main group. Some raids also use Violet Badge during progression to offset stacks of the Mark of Solarian debuff if raid members are dying to Blinding Light.</p>
+
+    <h2 class="sec">Abilities</h2>
+    <table>
+      <thead><tr><th>Ability</th><th>Phase</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Arcane Missiles</td><td>Phase 1</td><td>Channels on a random player. Cannot be interrupted. No threat table during Phase 1 — everyone goes all out.</td></tr>
+        <tr><td>Wrath of the Astromancer</td><td>Phase 1</td><td>Debuff on a random player — after 6 seconds it bounces to the nearest player and deals Arcane damage plus increased Arcane damage taken. Player runs to the designated soakers immediately. Soakers pass it between each other away from the group.</td></tr>
+        <tr><td>Blinding Light</td><td>Phase 1</td><td>Arcane damage to the entire raid every 20 seconds. Stacks of Mark of Solarian (reduces Arcane Resistance 15 per stack) make this increasingly dangerous over time.</td></tr>
+        <tr><td>Mark of Solarian</td><td>Phase 1</td><td>Stacking debuff reducing Arcane Resistance by 15 per stack. Accumulates throughout the fight, making Blinding Light increasingly punishing.</td></tr>
+        <tr><td>Solarian Portals</td><td>Phase 2</td><td>Every 50 seconds Solarian vanishes and portals spawn dozens of non-elite Solarium Agents. A tank picks them up and the raid AoEs them down. When Solarian respawns she brings two Solarium Priests — interrupt and stun them immediately.</td></tr>
+        <tr><td>Solarian Transform</td><td>Phase 3</td><td>At 20%, Solarian transforms into a large Voidwalker. She only casts Arcane Bolt (heavy single-target on the tank) and Psychic Scream (fears all nearby players). Get Tremor Totems and a Fear Ward rotation on the tank before she transforms.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">Phase Breakdown</h2>
+
+    <div class="phase ph-blue">
+      <div class="phase-header"><div class="num">1</div>Phase 1 — Active (50 seconds)</div>
+      <div class="phase-body">
+        <div class="trigger">Repeats every 50 seconds until Phase 2 triggers</div>
+        <p>No threat table during Phase 1 — everyone deals maximum damage. Tanks drop shields and DPS freely. Ranged stacks together to make it easy to identify when someone needs to run to the soakers. The moment Wrath of the Astromancer appears on a player, that player sprints to the soaker position immediately. Do not wait — 6 seconds goes fast.</p>
+        <div class="callout frost"><strong>Wrath of the Astromancer</strong>Stack ranged in a tight group so there is a clear "inside the raid" and "outside the raid." The debuffed player runs out to the soakers. The soakers bounce it between themselves. The debuffed player returns to the group once it's off them.</div>
+      </div>
+    </div>
+
+    <div class="phase ph-water">
+      <div class="phase-header"><div class="num">2</div>Phase 2 — Portals (adds)</div>
+      <div class="phase-body">
+        <p>Solarian disappears and Solarium Agents flood in from beams of light. A tank picks them all up and the raid AoEs them down as fast as possible. When Solarian respawns she brings two Solarium Priests — these can be interrupted and stunned. Melee and Rogues get on the Priests immediately to kick and Kidney Shot. Once the Priests are handled it's back to Phase 1 for another 50 seconds.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-purple">
+      <div class="phase-header"><div class="num">3</div>Phase 3 — Voidwalker (20%)</div>
+      <div class="phase-body">
+        <div class="trigger">Triggered at 20% HP</div>
+        <p>Solarian transforms into a large armored Voidwalker. She stops all previous casts and only uses Arcane Bolt (heavy tank damage) and Psychic Scream (fears everyone in melee range). This is essentially a tank-and-spank burn phase — the only challenge is the fear. Get Fear Ward on the main tank and Tremor Totems down before she hits 20%. Priests rotate Fear Ward on the tank throughout this phase.</p>
+      </div>
+    </div>
+
+    <h2 class="sec">Role Notes</h2>
+    <div class="roles">
+      <div class="role-card tank">
+        <h4>Tanks</h4>
+        <ul>
+          <li>Phase 1: drop your shield and DPS — no threat table, everyone goes all out</li>
+          <li>Phase 2: pick up all Solarium Agents immediately when they spawn</li>
+          <li>Paladin tanks are ideal for Phase 2 AoE pickup</li>
+          <li>Phase 3: hold the Voidwalker — get Fear Ward and Tremor Totem before 20%</li>
+        </ul>
+      </div>
+      <div class="role-card melee">
+        <h4>Melee DPS</h4>
+        <ul>
+          <li>Phase 1: go crazy — no threat table, boss can't dodge while channeling</li>
+          <li>Phase 2: Rogues kick and Kidney Shot the Solarium Priests immediately</li>
+          <li>Phase 3: stay near Tremor Totem to break fear quickly</li>
+        </ul>
+      </div>
+      <div class="role-card ranged">
+        <h4>Ranged DPS</h4>
+        <ul>
+          <li>Stack together in Phase 1 so Wrath runners have a clear path out</li>
+          <li>If you get Wrath of the Astromancer, run to the soakers immediately</li>
+          <li>Phase 2: AoE Solarium Agents down fast</li>
+          <li>Phase 3: burn the boss</li>
+        </ul>
+      </div>
+      <div class="role-card heal">
+        <h4>Healers</h4>
+        <ul>
+          <li>Stack with ranged in Phase 1 — same Wrath of the Astromancer rules apply to you</li>
+          <li>Blinding Light damage goes out every 20 seconds — keep the raid topped</li>
+          <li>Priests: rotate Fear Ward on the main tank during Phase 3</li>
+          <li>Phase 3 is a straightforward burn — heavy tank healing from Arcane Bolt</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     BOSS 4 — KAEL'THAS SUNSTRIDER
+═════════════════════════════════════════════════════════ -->
+<section class="boss-section" id="kaelthas">
+  <div class="hero" style="background: linear-gradient(160deg, #1a0d20 0%, #200d10 100%); border-bottom: 2px solid var(--gold);">
+    <div class="hero-img">
+      <img src="Screenshot 2026-05-07 082403.png" alt="Kael'thas Sunstrider">
+    </div>
+    <div class="hero-text">
+      <div class="hero-order">Tempest Keep: The Eye — Boss 4 of 4 — Final Boss</div>
+      <h2 style="color:var(--gold2); text-shadow:0 0 40px rgba(201,168,76,0.5);">Kael'thas Sunstrider</h2>
+      <div class="hero-sub">Five phases — advisors, weapons, advisors again, Kael, then Gravity Lapse at 50%</div>
+      <div class="badges">
+        <div class="badge gold">5 Phases</div>
+        <div class="badge diff">High Complexity</div>
+        <div class="badge" style="border-color:var(--red);color:#e87a7a;background:rgba(201,76,76,0.08);">Mind Control</div>
+        <div class="badge" style="border-color:#e8a06a;color:#f0c080;background:rgba(232,160,106,0.08);">Legendary Weapons</div>
+      </div>
+    </div>
+  </div>
+  <div class="boss-body">
+
+    <h2 class="sec">Overview</h2>
+    <p>Kael'thas is the most complex fight in TBC Classic. Five phases, four named advisors, seven legendary weapons, Mind Controls, a Phoenix that respawns from an egg, a Shock Barrier and Pyroblast sequence that can wipe a raid, and a Gravity Lapse at 50% that throws everyone into the air. Read this before you pull.</p>
+
+    <div class="callout gold">
+      <strong>Kill Position Matters in Phase 1</strong>
+      Each advisor dies in a specific location. They respawn in exactly that spot in Phase 3. Bad Phase 1 positioning makes Phase 3 a nightmare.
+      Thaladred: wherever he falls (hard to control). Sanguinar: against a side wall. Capernian: back of the room near the entrance. Telonicus: opposite wall from Sanguinar.
+    </div>
+
+    <h2 class="sec">Advisor Abilities</h2>
+    <table>
+      <thead><tr><th>Advisor</th><th>Ability</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Thaladred</td><td>Fixate</td><td>No threat table. Fixates on a random player and slowly moves toward them. Fixated player must run. 30-yard range on Psychic Blow — stay far. Melee should not attack him at all.</td></tr>
+        <tr><td></td><td>Silence</td><td>Interrupts spellcasting for all within 8 yards. Do not stand near him.</td></tr>
+        <tr><td>Sanguinar</td><td>Bellowing Roar</td><td>AoE fear with a cast time — cannot be interrupted. Fear Ward on tanks, Tremor Totems down before engaging.</td></tr>
+        <tr><td>Capernian</td><td>Conflagration</td><td>Targets a random player within 30 yards — Fire DoT and disorientation to the target and nearby players. Entire raid stays at max range. Warlock tanks with Searing Pain only.</td></tr>
+        <tr><td></td><td>Arcane Burst</td><td>AoE knockback to all in melee range. Nobody in melee range except the Warlock tank.</td></tr>
+        <tr><td>Telonicus</td><td>Remote Toy</td><td>Stuns a random player for 4 seconds periodically. Can be removed by the Staff of Disintegration on-use.</td></tr>
+        <tr><td></td><td>Bomb</td><td>Short cast, not interruptible. AoE fire damage — spread out if near him.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">Weapon Reference</h2>
+    <table>
+      <thead><tr><th>Weapon</th><th>As Enemy</th><th>When Equipped</th></tr></thead>
+      <tbody>
+        <tr><td>Netherstrand Longbow</td><td>Multi-shot — Hunter tanks it facing away from the raid. Has a blink ability and drops threat on melee-range players.</td><td>Chance on hit to increase Physical damage dealt to target, stacks up to 5.</td></tr>
+        <tr><td>Devastation</td><td>Massive Whirlwind — can one-shot players. Warrior or Druid tank holds it away from the raid.</td><td>Chance on hit to increase movement and attack speed.</td></tr>
+        <tr><td>Staff of Disintegration</td><td>Frostbolt and Frost Nova — after Nova it tries to run and cast Frostbolts.</td><td>On-use AoE that removes stuns, including Remote Toy from Telonicus.</td></tr>
+        <tr><td>Infinity Blade</td><td>Thrash (extra auto attacks).</td><td>100% chance to dispel Mind Control when hitting with a weapon ability. Every melee should grab this.</td></tr>
+        <tr><td>Phaseshift Bulwark</td><td>Shield Spike (reflects damage).</td><td>On-use: 100,000 HP absorb shield plus immunity to fear and snare for 4 seconds. Main Tank must have this for Phase 4 Pyroblast.</td></tr>
+        <tr><td>Cosmic Infuser</td><td>Heal ability — interrupt it.</td><td>All heals from this wielder give a buff reducing Fire and Shadow damage taken by 50%. Healers prioritize this.</td></tr>
+        <tr><td>Warp Slicer</td><td>Stacking Rend bleed.</td><td>Chance on hit to increase movement and attack speed.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout warn"><strong>Phaseshift Bulwark must be in the Main Tank's hands before Phase 4 begins.</strong>Kill the Shield before Phase 3 ends. Without it, the Main Tank cannot absorb the first Pyroblast and will likely die.</div>
+
+    <h2 class="sec">Phase Breakdown</h2>
+
+    <div class="phase ph-trans">
+      <div class="phase-header"><div class="num">1</div>Phase 1 — Kill advisors one at a time, in order, in position</div>
+      <div class="phase-body">
+        <p>Advisors activate one at a time. Kill them in this order and in the locations described above.</p>
+        <p><strong style="color:var(--frost2);">Thaladred:</strong> Fixated player runs. Ranged kills. Melee stays away entirely. Kill wherever he falls.</p>
+        <p><strong style="color:var(--red);">Sanguinar:</strong> Tank against a side wall. Fear Ward on tank, Tremor Totems down. Kill against the wall.</p>
+        <p><strong style="color:var(--purple);">Capernian:</strong> Warlock tanks with Searing Pain at the back of the room. Hunter Misdirection helps threat. Entire raid stays at max range. Ranged kills. Melee watches. Kill at the back near the entrance.</p>
+        <p><strong style="color:var(--teal);">Telonicus:</strong> Tank on the opposite wall from Sanguinar. Staff of Disintegration removes his Remote Toy stun debuff. Kill on the opposite wall.</p>
+        <p>When all four are dead, weapons spawn. Phase 2 begins.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-gold" style="border:1px solid var(--border);background:var(--bg2);margin-bottom:18px;overflow:hidden;">
+      <div class="phase-header" style="background:rgba(201,168,76,0.10);border-bottom:1px solid rgba(201,168,76,0.25);color:var(--gold2);padding:12px 18px;font-family:'Cinzel',serif;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;">
+        <div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:rgba(201,168,76,0.18);color:var(--gold2);">2</div>
+        Phase 2 — Seven legendary weapons spawn as enemies
+      </div>
+      <div class="phase-body">
+        <p>Stack all weapons together except Devastation. Hunter tanks the Longbow and faces it away from the raid. A Warrior or Druid holds Devastation separate. Paladin AoE tank holds the rest. AoE everything down.</p>
+        <p>Typical kill priority: Staff or Bow first, then the rest. Kill the Shield last — the Main Tank absolutely needs Phaseshift Bulwark equipped before Phase 4. Once a weapon dies it's lootable for 60 seconds. Every player picks up the best weapon for their role. Every melee also grabs Infinity Blade.</p>
+        <p>Two minutes after the weapons spawn, all four advisors respawn. Phase 3 begins.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-red">
+      <div class="phase-header"><div class="num">3</div>Phase 3 — All four advisors at once — 3-minute window</div>
+      <div class="phase-body">
+        <div class="callout warn"><strong>Use Bloodlust Here</strong>If you save Bloodlust for Phase 4, a Shaman may get Mind Controlled and cast it on Kael — wasting it or making things significantly harder. Use it in Phase 3 to blow through this chaotic phase.</div>
+        <div class="kill-order">
+          <div class="kill-badge kb-melee">Sanguinar <span class="role-tag">Melee + main tank</span></div>
+          <div class="kill-badge kb-melee">Telonicus <span class="role-tag">Melee cleave</span></div>
+          <div class="kill-badge kb-ranged">Thaladred <span class="role-tag">Ranged only</span></div>
+          <div class="kill-badge kb-ranged">Capernian <span class="role-tag">Ranged + Warlock tank</span></div>
+        </div>
+        <p>Thaladred fixates random players — whoever gets it runs, no exceptions. The Warlock tank holds Capernian at the back. Main tank on Sanguinar, off-tank on Telonicus. Melee stays away from Thaladred and Capernian entirely. Ranged kills Thaladred first then Capernian. Staff of Disintegration removes Telonicus's stun. Cosmic Infuser makes healing the Warlock tank much more manageable. Kael'thas becomes active three minutes after Phase 3 starts.</p>
+      </div>
+    </div>
+
+    <div class="phase ph-purple">
+      <div class="phase-header"><div class="num">4</div>Phase 4 — Kael'thas active</div>
+      <div class="phase-body">
+        <p>Kael'thas activates three minutes into Phase 3 (whether advisors are dead or not — kill them). Ranged stack up. Interrupt Fireball every cast.</p>
+        <table>
+          <thead><tr><th>Ability</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Fireball</td><td>Interrupt every time it is cast. Set up a kick rotation if needed.</td></tr>
+            <tr><td>Flamestrike</td><td>Fire AoE on the ground — move out immediately. Can intentionally step into it to break Arcane Disruption disorientation.</td></tr>
+            <tr><td>Mind Control</td><td>Multiple raid members get MC'd. Stop DPS, crowd control the targets, and have Infinity Blade melee run over and hit them with a weapon-based ability (not auto attacks) to break it. CC first, Infinity Blade second.</td></tr>
+            <tr><td>Summon Phoenix</td><td>An off-tank picks up the Phoenix and kites it. It kills itself via Hellfire over time — DPS don't need to attack it. Off-tank runs away before it dies (it explodes). Phoenix drops an egg — all DPS kill the egg within 15 seconds or it fully respawns. If there is an egg AND a Shock Barrier incoming, prioritize Pyroblast over the egg.</td></tr>
+            <tr><td>Shock Barrier + Pyroblast</td><td>Kael casts a shield preventing interrupts, then three consecutive Pyroblasts (~50,000 fire damage each), then Arcane Disruption. Main tank uses Phaseshift Bulwark to absorb the first Pyroblast. Entire raid burns through the Shock Barrier and kicks the second Pyroblast. If a Pyroblast is ever interrupted, Kael skips the remaining Pyroblasts and goes straight to Arcane Disruption.</td></tr>
+            <tr><td>Arcane Disruption</td><td>Disorients the entire raid. Follows up after three Pyroblasts or an interrupted Pyroblast. Stepping into a Flamestrike breaks the disorientation.</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warn"><strong>Shock Barrier Priority</strong>If there is a Phoenix Egg and a Shock Barrier at the same time, the Pyroblast takes priority. The Main Tank dying ends the fight. Two Phoenixes is chaos but survivable — a dead main tank is not.</div>
+      </div>
+    </div>
+
+    <div class="phase ph-red">
+      <div class="phase-header"><div class="num">5</div>Phase 5 — Gravity Lapse at 50% HP</div>
+      <div class="phase-body">
+        <div class="trigger">Triggered at 50% HP — Kael stops Pyroblast and Mind Control</div>
+        <p>Kael teleports the entire raid to him and gives everyone the ability to fly for 30 seconds. Phoenixes evade during Gravity Lapse — ignore them. Do not touch the ground or you take damage and get launched back up.</p>
+        <div class="callout warn"><strong>Spread out immediately in the air.</strong>Right after Gravity Lapse, Kael casts Netherbeam — it deals Arcane damage and bounces to nearby players, doubling in damage each bounce (like C'thun's Eye Beam). If the raid is clustered, it chains and kills people. Spread wide.</div>
+        <p>Also avoid black Nether Vapor clouds in the air — touching them applies a stacking debuff reducing your max health. After 30 seconds everyone falls. Do not fly too high before the end or fall damage will kill you.</p>
+        <p>After the first Gravity Lapse, Kael returns to Phase 4 abilities. The cycle repeats until he dies.</p>
+      </div>
+    </div>
+
+    <h2 class="sec">Role Notes</h2>
+    <div class="roles">
+      <div class="role-card tank">
+        <h4>Tanks</h4>
+        <ul>
+          <li>Phase 1 and 3: assign tanks to each advisor — main tank on Sanguinar, off-tank on Telonicus, Warlock on Capernian</li>
+          <li>Fear Ward and Tremor Totem for Sanguinar in both Phase 1 and Phase 3</li>
+          <li>Main tank: equip Phaseshift Bulwark before Phase 4 — use it to absorb the first Pyroblast</li>
+          <li>Off-tank: kite the Phoenix in Phase 4, run away before it dies</li>
+        </ul>
+      </div>
+      <div class="role-card melee">
+        <h4>Melee DPS</h4>
+        <ul>
+          <li>Do not go near Thaladred or Capernian in Phase 1 and 3 — they will kill you</li>
+          <li>Every melee equips Infinity Blade in Phase 2 alongside their desired weapon</li>
+          <li>Break Mind Controls with weapon-based abilities, not auto attacks</li>
+          <li>Interrupt Fireball and burn through Shock Barrier</li>
+          <li>Kill Phoenix eggs within 15 seconds</li>
+          <li>Spread out during Gravity Lapse, avoid Nether Vapor, land low</li>
+        </ul>
+      </div>
+      <div class="role-card ranged">
+        <h4>Ranged DPS</h4>
+        <ul>
+          <li>Phase 1 and 3: Thaladred and Capernian are ranged-only kills</li>
+          <li>Hunter tanks the Longbow in Phase 2, faces it away from the raid</li>
+          <li>Interrupt Fireball, burn Shock Barrier, kill Phoenix eggs</li>
+          <li>Spread immediately during Gravity Lapse — Netherbeam chains and kills clustered players</li>
+          <li>Avoid Nether Vapor clouds in the air, land low before the 30-second drop</li>
+        </ul>
+      </div>
+      <div class="role-card heal">
+        <h4>Healers</h4>
+        <ul>
+          <li>Fear Ward rotation on the main tank for Phase 3 Sanguinar and Phase 4 onward</li>
+          <li>Equip Cosmic Infuser in Phase 2 — it makes healing the Warlock tank in Phase 3 significantly easier</li>
+          <li>Phase 4: heavy sustained healing through Phoenix AoE, Fireball, and Arcane Disruption</li>
+          <li>Stay at max range from Thaladred and Capernian in all advisor phases</li>
+          <li>Spread during Gravity Lapse, avoid Nether Vapor, watch health on landing</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</main>
+</div><!-- end tk inner flex -->
+</div><!-- end tk-content -->
+
+<!-- ══════════════════════════════════════════════════════════
+     CHEAT SHEETS
+══════════════════════════════════════════════════════════ -->
+<div id="cs-content" class="raid-content">
+<style>
+  .cs-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 24px 48px;
+    width: 100%;
+  }
+  .cs-raid-header {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin: 32px 0 16px;
+  }
+  .cs-raid-header:first-child { margin-top: 0; }
+  .cs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .cs-card {
+    background: #141b24;
+    border: 1px solid #2a3f5a;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .cs-card-hdr {
+    padding: 9px 13px;
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+  }
+  .cs-boss-num {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.6;
+    color: #fff;
+  }
+  .cs-card-hdr h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #fff;
+    margin: 0;
+    line-height: 1.3;
+  }
+  .cs-body {
+    padding: 11px 13px;
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .cs-sec {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 9px 0 4px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #2a3f5a;
+  }
+  .cs-sec:first-child { margin-top: 0; }
+  .cs-body ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .cs-body ul li {
+    padding: 1px 0 1px 13px;
+    position: relative;
+    color: #b8c8d8;
+    font-size: 13.5px;
+  }
+  .cs-body ul li::before {
+    content: '·';
+    position: absolute;
+    left: 4px;
+    color: #3a4f65;
+    font-weight: 700;
+  }
+  .cs-crit { color: #f87171; font-weight: 600; }
+  .cs-warn { color: #fb923c; font-weight: 600; }
+  .cs-good { color: #4ade80; font-weight: 600; }
+  .cs-tag {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 1px 5px;
+    border-radius: 2px;
+    margin-right: 3px;
+    vertical-align: middle;
+  }
+  .cs-tag-tank  { background: #1e3a8a; color: #93c5fd; }
+  .cs-tag-heal  { background: #14532d; color: #86efac; }
+  .cs-tag-dps   { background: #7c1d1d; color: #fca5a5; }
+  .cs-full { grid-column: 1 / -1; }
+  .cs-phase {
+    margin: 6px 0;
+    padding: 6px 9px;
+    border-left: 2px solid;
+    background: rgba(0,0,0,0.2);
+    border-radius: 0 2px 2px 0;
+  }
+  .cs-phase-lbl {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .cs-resist {
+    display: flex;
+    gap: 7px;
+    margin: 5px 0;
+  }
+  .cs-resist-box {
+    flex: 1;
+    padding: 5px 8px;
+    border-radius: 2px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .cs-resist-frost  { background: #0c2a4a; border: 1px solid #1e6fa8; color: #7dd3fc; }
+  .cs-resist-nature { background: #0a2e16; border: 1px solid #166534; color: #86efac; }
+  .cs-ko {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 5px 0;
+  }
+  .cs-ko-item {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 2px;
+    padding: 2px 7px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #e2e8f0;
+  }
+  .cs-ko-arrow { color: #4b5563; font-size: 13px; }
+  .cs-vashj-phases { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 6px; }
+  .cs-kael-phases  { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 6px; }
+  .cs-weapon-tbl { width:100%; border-collapse:collapse; font-size:12px; margin:6px 0; }
+  .cs-weapon-tbl th { background:#0f172a; color:#94a3b8; font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; text-transform:uppercase; padding:4px 7px; text-align:left; font-weight:700; }
+  .cs-weapon-tbl td { padding:3px 7px; border-bottom:1px solid #1e293b; color:#cbd5e1; font-size:12px; }
+  .cs-weapon-tbl tr:nth-child(odd) td { background:rgba(255,255,255,0.02); }
+  .cs-weapon-tbl td.who { color:#fbbf24; font-weight:600; font-family:'Cinzel',serif; font-size:11px; }
+  .cs-trash-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px; margin-top:4px; }
+  .cs-trash-sec { background:rgba(0,0,0,0.2); border:1px solid #2a3f5a; border-radius:2px; padding:7px 9px; }
+  .cs-trash-lbl { font-family:'Cinzel',serif; font-size:9px; font-weight:700; letter-spacing:1px; color:#8a9ab0; text-transform:uppercase; margin-bottom:4px; padding-bottom:3px; border-bottom:1px solid #2a3f5a; }
+</style>
+
+<div class="cs-wrap">
+
+  <!-- ── SSC ──────────────────────────────────── -->
+  <div class="cs-raid-header">Serpentshrine Cavern</div>
+  <div class="cs-grid">
+
+    <!-- Hydross -->
+    <div class="cs-card">
+      <div class="cs-card-hdr" style="background:linear-gradient(90deg,#0c2a4a,#0e1f3a);">
+        <span class="cs-boss-num">Boss 1</span>
+        <h3 style="color:#7dd3fc;">Hydross the Unstable</h3>
+      </div>
+      <div class="cs-body">
+        <div class="cs-resist">
+          <div class="cs-resist-box cs-resist-frost">Frost Tank<br>365 FR &mdash; Blue Phase</div>
+          <div class="cs-resist-box cs-resist-nature">Nature Tank<br>365 NR &mdash; Green Phase</div>
+        </div>
+        <div class="cs-sec">Tanking</div>
+        <ul>
+          <li>Tank at spawn point &mdash; boss does not move</li>
+          <li>4x <strong>Mark of Hydross</strong> &rarr; pull past the flags &rarr; transition, drops aggro</li>
+          <li>4 adds spawn every transition &mdash; <span class="cs-tag cs-tag-tank">off tanks</span> grab and nuke immediately</li>
+        </ul>
+        <div class="cs-sec">Raid</div>
+        <ul>
+          <li><span style="color:#7dd3fc;font-weight:600;">Blue phase:</span> spread out &nbsp;|&nbsp; <span style="color:#4ade80;font-weight:600;">Green phase:</span> AoE heal freely</li>
+          <li>Transition briefly stops all damage &mdash; free GCDs</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Lurker -->
+    <div class="cs-card">
+      <div class="cs-card-hdr" style="background:linear-gradient(90deg,#0a2030,#091828);">
+        <span class="cs-boss-num">Boss 2</span>
+        <h3 style="color:#38bdf8;">The Lurker Below</h3>
+      </div>
+      <div class="cs-body">
+        <div class="cs-sec">Summon</div>
+        <ul><li><span class="cs-warn">300 Fishing required.</span> Cast at the marked pool.</li></ul>
+        <div class="cs-sec">Phase 1</div>
+        <ul>
+          <li><strong>Spout:</strong> <span class="cs-crit">jump INTO the water</span> before it hits &mdash; time it once, don't spam jump</li>
+          <li><strong>Geyser / Whirl:</strong> move off boil marks immediately</li>
+          <li>Spread out to reduce knockback overlap</li>
+        </ul>
+        <div class="cs-sec">Phase 2 (Boss Submerges)</div>
+        <ul>
+          <li>Adds on platforms &mdash; <span class="cs-crit">CC Ambushers immediately</span></li>
+          <li>Kill melee ads first (they cleave); <span class="cs-tag cs-tag-dps">DPS</span> wait for tank threat before AoE</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Leotheras -->
+    <div class="cs-card">
+      <div class="cs-card-hdr" style="background:linear-gradient(90deg,#2a0a3a,#1e0828);">
+        <span class="cs-boss-num">Boss 3</span>
+        <h3 style="color:#c084fc;">Leotheras the Blind</h3>
+      </div>
+      <div class="cs-body">
+        <div class="cs-sec">Human Form</div>
+        <ul>
+          <li><strong>Whirlwind:</strong> <span class="cs-tag cs-tag-tank">tank</span> repositions him &mdash; entire raid run out until it ends</li>
+        </ul>
+        <div class="cs-sec">Demon Form (drops all threat)</div>
+        <ul>
+          <li><span class="cs-tag cs-tag-tank">Warlock tank</span> with fire resist gear spams <strong>Searing Pain</strong></li>
+          <li><strong>Inner Demon:</strong> only you can see it &mdash; <span class="cs-crit">nuke immediately</span> or permanent MC</li>
+        </ul>
+        <div class="cs-sec">15% Split</div>
+        <ul>
+          <li>Human + Demon form appear simultaneously</li>
+          <li><span class="cs-crit">Nuke HUMAN form only</span> to end the fight</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Karathress -->
+    <div class="cs-card">
+      <div class="cs-card-hdr" style="background:linear-gradient(90deg,#0a2a28,#081e1c);">
+        <span class="cs-boss-num">Boss 4</span>
+        <h3 style="color:#34d399;">Fathom-Lord Karathress</h3>
+      </div>
+      <div class="cs-body">
+        <div class="cs-sec">Kill Order</div>
+        <div class="cs-ko">
+          <span class="cs-ko-item" style="border-color:#f87171;color:#f87171;">Tidalvess</span>
+          <span class="cs-ko-arrow">&rarr;</span>
+          <span class="cs-ko-item">Sharkkis</span>
+          <span class="cs-ko-arrow">&rarr;</span>
+          <span class="cs-ko-item">Caribdis</span>
+          <span class="cs-ko-arrow">&rarr;</span>
+          <span class="cs-ko-item" style="border-color:#fb923c;color:#fb923c;">Karathress</span>
+        </div>
+        <ul style="margin-bottom:5px;"><li style="color:var(--muted);font-size:12.5px;">Each kill grants Karathress that mob's ability.</li></ul>
+        <div class="cs-sec">Per Target</div>
+        <ul>
+          <li><strong>Tidalvess:</strong> <span class="cs-crit">Spitfire Totem = instant kill &mdash; destroy it the second it spawns.</span> Karathress inherits it.</li>
+          <li><strong>Sharkkis:</strong> pet spawns (Bog Lord = <span class="cs-warn">melee run away before death, explodes</span>)</li>
+          <li><strong>Caribdis:</strong> far away, dedicated interrupt team at all times</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tidewalker -->
+    <div class="cs-card">
+      <div class="cs-card-hdr" style="background:linear-gradient(90deg,#0a1a40,#081430);">
+        <span class="cs-boss-num">Boss 5</span>
+        <h3 style="color:#93c5fd;">Morogrim Tidewalker</h3>
+      </div>
+      <div class="cs-body">
+        <div class="cs-sec">Positioning</div>
+        <ul><li>Frontal cone &mdash; tank facing <strong>away from raid</strong> at all times</li></ul>
+        <div class="cs-sec">Mechanics</div>
+        <ul>
+          <li><strong>Watery Grave:</strong> 4 players teleported &mdash; <span class="cs-tag cs-tag-heal">healers</span> top to full immediately</li>
+          <li><strong>Earthquake + Murlocs:</strong> two packs both sides &mdash; pre-positioned off tanks pick up, drag to boss</li>
+          <li><span class="cs-crit">Wait for tank threat before AoE</span> on murlocs</li>
+          <li>Prot Paladin ideal for murloc AoE tanking</li>
+          <li><strong>25%:</strong> Globules &mdash; corner them and burn</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Vashj - full width -->
+    <div class="cs-card cs-full">
+      <div class="cs-card-hdr" style="background:linear-gradient(90deg,#1e0a40,#160830);">
+        <span class="cs-boss-num">Boss 6</span>
+        <h3 style="color:#a78bfa;">Lady Vashj</h3>
+      </div>
+      <div class="cs-body">
+        <div class="cs-vashj-phases">
+          <div class="cs-phase" style="border-color:#a78bfa;">
+            <div class="cs-phase-lbl" style="color:#a78bfa;">Phase 1 &mdash; Tank &amp; Spank</div>
+            <ul>
+              <li>Standard tank + DPS</li>
+              <li><strong>Static Charge:</strong> <span class="cs-crit">move away from everyone immediately</span> if you get it</li>
+              <li>Phase ends at 70% HP</li>
+            </ul>
+          </div>
+          <div class="cs-phase" style="border-color:#f59e0b;">
+            <div class="cs-phase-lbl" style="color:#f59e0b;">Phase 2 &mdash; 70% (Boss Immune)</div>
+            <ul>
+              <li>4 Shield Generators need Tainted Cores to disable</li>
+              <li><strong>Enchanted Elementals:</strong> <span class="cs-crit">kill before they reach Vashj</span></li>
+              <li><strong>Striders:</strong> <span class="cs-crit">ranged kite only</span> &mdash; AoE fear, do NOT melee</li>
+              <li><strong>Elite Nagas:</strong> melee from behind</li>
+              <li><strong>Tainted Core:</strong> call it, kill it, <span class="cs-warn">can't move with it in bag</span> &mdash; pass it toward generator</li>
+            </ul>
+          </div>
+          <div class="cs-phase" style="border-color:#f87171;">
+            <div class="cs-phase-lbl" style="color:#f87171;">Phase 3 &mdash; Generators Down</div>
+            <ul>
+              <li>Vashj takes damage again &mdash; burn</li>
+              <li>Spread for <strong>Static Charge</strong></li>
+              <li><strong>Toxic Spore Bats:</strong> ranged kill fast &mdash; <span class="cs-warn">poison cloud on death</span></li>
+              <li>Off tanks taunt mind-controlled players</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end SSC cs-grid -->
+
+  <!-- ── TK ──────────────────────────────────── -->
+  <div class="cs-raid-header">Tempest Keep: The Eye</div>
+  <div class="cs-grid">
+
+    <!-- Trash - full width -->
+    <div class="cs-card cs-full">
+      <div class="cs-card-hdr" style="background:linear-gradient(90deg,#1e1e2e,#171726);">
+        <span class="cs-boss-num">Trash</span>
+        <h3 style="color:#94a3b8;">Notable Trash Mobs</h3>
+      </div>
+      <div class="cs-body">
+        <div class="cs-trash-grid">
+          <div class="cs-trash-sec">
+            <div class="cs-trash-lbl">Astromancer + Star Scryer</div>
+            <ul>
+              <li><span class="cs-crit">Kill Astromancer &amp; Star Scryer first</span> every pack</li>
+              <li><strong>Astromancer:</strong> Molten Armor (purge it); Blast Wave + Fireball Volley AoE</li>
+              <li><strong>Star Scryer:</strong> Domination = <span class="cs-crit">Mind Control</span> &mdash; CC target; Arcane Blast knockback (tank against wall)</li>
+            </ul>
+          </div>
+          <div class="cs-trash-sec">
+            <div class="cs-trash-lbl">Bloodwarder Marshal Pack</div>
+            <ul>
+              <li>Marshal + 2 Bloodwarder Squires</li>
+              <li><strong>Squires:</strong> <span class="cs-crit">interrupt Cleanse and Heal constantly</span></li>
+              <li><strong>Marshal:</strong> Whirlwind AoE (step out); Uppercut knockback (tank against wall)</li>
+            </ul>
+          </div>
+          <div class="cs-trash-sec">
+            <div class="cs-trash-lbl">Al'ar's Room &mdash; Phoenix-Hawks</div>
+            <ul>
+              <li>Pull into hallway before entering the room</li>
+              <li><strong>Hatchlings:</strong> 6-sec AoE Silence &mdash; <span class="cs-warn">casters stay at range</span>; Wing Buffet (tank in corner)</li>
+              <li><strong>Phoenix-Hawks:</strong> Dive charges furthest player &mdash; stack up; Mana Burn AoE &mdash; small pulls only</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Void Reaver -->
+    <div class="cs-card">
+      <div class="cs-card-hdr" style="background:linear-gradient(90deg,#1a0f38,#13092a);">
+        <span class="cs-boss-num">Boss 1</span>
+        <h3 style="color:#a78bfa;">Void Reaver</h3>
+      </div>
+      <div class="cs-body">
+        <div class="cs-sec">Tanking (3-4 Tanks Required)</div>
+        <ul>
+          <li><strong>Pounding:</strong> channeled AoE, very frequent &mdash; next tank taunts as soon as it starts</li>
+          <li><strong>Knock Away:</strong> punts tank + reduces threat &mdash; never solo tank</li>
+          <li>All tanks build threat simultaneously at all times</li>
+          <li><span class="cs-tag cs-tag-tank">Warriors:</span> dual wield when not main tanking</li>
+        </ul>
+        <div class="cs-sec">Raid</div>
+        <ul>
+          <li>Ranged: spread in <strong>groups of 2-3</strong> across the room (not solo, not stacked)</li>
+          <li><strong>Arcane Orb:</strong> targeted player <span class="cs-crit">run away from your group</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Al'ar -->
+    <div class="cs-card">
+      <div class="cs-card-hdr" style="background:linear-gradient(90deg,#3a0f00,#2a0a00);">
+        <span class="cs-boss-num">Boss 2</span>
+        <h3 style="color:#fb923c;">Al'ar</h3>
+      </div>
+      <div class="cs-body">
+        <div class="cs-phase" style="border-color:#fb923c;">
+          <div class="cs-phase-lbl" style="color:#fb923c;">Phase 1 &mdash; 100% to 35%</div>
+          <ul>
+            <li>6 platforms clockwise; 3 tanks pre-positioned, rotate as boss moves</li>
+            <li><strong>Flame Quills:</strong> <span class="cs-crit">jump OFF platform</span> before it hits &mdash; time it once</li>
+            <li>DPS on Al'ar's platform; casters in center</li>
+          </ul>
+        </div>
+        <div class="cs-phase" style="border-color:#f87171;">
+          <div class="cs-phase-lbl" style="color:#f87171;">Phase 2 &mdash; Below 35%</div>
+          <ul>
+            <li><strong>Melt Armor:</strong> tank swap immediately</li>
+            <li><strong>Dive Bomb:</strong> <span class="cs-good">stack together</span> to share damage</li>
+            <li><strong>Flame Patch:</strong> dodge fire on ground</li>
+            <li><strong>Phoenix:</strong> OT kites; explodes &rarr; egg (15 sec) &rarr; burn egg</li>
+            <li><span class="cs-warn">10-min enrage</span> &mdash; use tank cooldowns</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Solarian -->
+    <div class="cs-card">
+      <div class="cs-card-hdr" style="background:linear-gradient(90deg,#0c1a3a,#091228);">
+        <span class="cs-boss-num">Boss 3</span>
+        <h3 style="color:#7dd3fc;">High Astromancer Solarian</h3>
+      </div>
+      <div class="cs-body">
+        <div class="cs-phase" style="border-color:#7dd3fc;">
+          <div class="cs-phase-lbl" style="color:#7dd3fc;">Phase 1 &mdash; Active Cycles</div>
+          <ul>
+            <li>No threat table &mdash; <span class="cs-tag cs-tag-tank">tanks DPS</span> like everyone else</li>
+            <li><strong>Wrath of the Astromancer:</strong> 2 soakers with <span class="cs-warn">arcane resist gear</span> spread far from raid</li>
+            <li><strong>Mark of Solarian:</strong> stacking debuff reducing arcane resist</li>
+          </ul>
+        </div>
+        <div class="cs-phase" style="border-color:#a78bfa;">
+          <div class="cs-phase-lbl" style="color:#a78bfa;">Phase 2 &mdash; Portals</div>
+          <ul>
+            <li>Agents: AoE down fast</li>
+            <li>Solarium Priests: <span class="cs-crit">interrupt every cast</span></li>
+          </ul>
+        </div>
+        <div class="cs-phase" style="border-color:#f87171;">
+          <div class="cs-phase-lbl" style="color:#f87171;">Phase 3 &mdash; 20% (Voidwalker)</div>
+          <ul>
+            <li>Tank resumes; <span class="cs-tag cs-tag-heal">Priests</span> rotate <strong>Fear Ward</strong> on tank; burn</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kael'thas - full width -->
+    <div class="cs-card cs-full">
+      <div class="cs-card-hdr" style="background:linear-gradient(90deg,#3a0a0a,#2a0808);">
+        <span class="cs-boss-num">Boss 4</span>
+        <h3 style="color:#f87171;">Kael'thas Sunstrider</h3>
+      </div>
+      <div class="cs-body">
+        <div class="cs-kael-phases">
+          <div class="cs-phase" style="border-color:#94a3b8;">
+            <div class="cs-phase-lbl" style="color:#94a3b8;">Phase 1 &mdash; Advisors</div>
+            <ul>
+              <li>One at a time, in order</li>
+              <li><strong>Thaladred:</strong> tank far from raid (fixates)</li>
+              <li><strong>Sanguinar:</strong> tank against wall (silences)</li>
+              <li><strong>Capernian:</strong> AoE nuke &mdash; tank back of room</li>
+              <li><strong>Telonicus:</strong> opposite wall; watch for bombs</li>
+            </ul>
+          </div>
+          <div class="cs-phase" style="border-color:#fbbf24;">
+            <div class="cs-phase-lbl" style="color:#fbbf24;">Phase 2 &mdash; Weapons</div>
+            <table class="cs-weapon-tbl">
+              <thead><tr><th>Weapon</th><th>Tank</th></tr></thead>
+              <tbody>
+                <tr><td>Sunflare Longbow</td><td class="who">Hunter (face away)</td></tr>
+                <tr><td>Infinity Blade / Devastation</td><td class="who">Warrior / Druid</td></tr>
+                <tr><td>Remaining 4</td><td class="who">Paladin AoE</td></tr>
+              </tbody>
+            </table>
+            <ul><li><span class="cs-crit">MT equip Phaseshift Bulwark</span> before Phase 4</li></ul>
+          </div>
+          <div class="cs-phase" style="border-color:#4ade80;">
+            <div class="cs-phase-lbl" style="color:#4ade80;">Phase 3 &mdash; Advisors Return</div>
+            <ul>
+              <li>All 4 respawn simultaneously</li>
+              <li><span class="cs-crit">USE BLOODLUST HERE</span></li>
+              <li>Shaman MC risk in Phase 4 &mdash; don't save it</li>
+              <li>3-minute window</li>
+            </ul>
+          </div>
+          <div class="cs-phase" style="border-color:#f87171;">
+            <div class="cs-phase-lbl" style="color:#f87171;">Phase 4 &mdash; Kael Active</div>
+            <ul>
+              <li><strong>Fireball:</strong> assigned interrupt rotation</li>
+              <li><strong>Shock Barrier + Pyroblast x3:</strong> MT absorbs 1st (Phaseshift Bulwark) &rarr; burn shield &rarr; <span class="cs-crit">kick 2nd</span></li>
+              <li><strong>Phoenix:</strong> OT kites; egg (15 sec) after death</li>
+              <li><strong>Mind Control:</strong> CC first &rarr; use weapon ability (not auto attacks)</li>
+              <li><strong>Arcane Disruption:</strong> step into Flamestrike</li>
+            </ul>
+          </div>
+          <div class="cs-phase" style="border-color:#c4b5fd;">
+            <div class="cs-phase-lbl" style="color:#c4b5fd;">Phase 5 &mdash; 50%</div>
+            <ul>
+              <li><strong>Gravity Lapse:</strong> <span class="cs-crit">stay airborne 30 sec</span></li>
+              <li><strong>Netherbeam:</strong> spread wide &mdash; doubles per bounce</li>
+              <li><strong>Nether Vapor:</strong> avoid black clouds</li>
+              <li><span class="cs-warn">Land low</span> before drop ends</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end TK cs-grid -->
+
+</div><!-- end cs-wrap -->
+</div><!-- end cs-content -->
+
+<script>
+  function showRaid(raid, btn) {
+    document.querySelectorAll('.raid-content').forEach(el => el.classList.remove('visible'));
+    document.querySelectorAll('.raid-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(raid + '-content').classList.add('visible');
+    btn.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // Sidebar active link on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        if (id) {
+          document.querySelectorAll('.boss-link').forEach(l => l.classList.remove('active'));
+          const active = document.querySelector(`.boss-link[href="#${id}"]`);
+          if (active) active.classList.add('active');
+        }
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+</script>
+
+<style>
+@media (max-width: 700px) {
+
+  /* ── HEADER ── */
+  .site-header { padding: 10px 14px; flex-wrap: wrap; gap: 6px; }
+  .site-title { font-size: 13px; }
+  .phase-tag { display: none; }
+  .raid-btn { padding: 5px 10px; font-size: 10px; letter-spacing: 1px; }
+
+  /* ── OUTER WRAPPERS ── */
+  .raid-content.visible { flex-direction: column; }
+  .layout { flex-direction: column; }
+  /* TK inner flex wrapper */
+  #tk-content > div[style*="display:flex"] {
+    flex-direction: column !important;
+  }
+
+  /* ── SIDEBAR → horizontal scrolling tab bar ── */
+  .sidebar {
+    width: 100% !important;
+    height: auto !important;
+    min-height: unset !important;
+    position: sticky !important;
+    top: 49px !important;
+    z-index: 99 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: 4px 0 !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
+  .sidebar-label { display: none; }
+  .boss-link {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 6px 12px !important;
+    border-left: 3px solid transparent !important;
+    border-bottom: 3px solid transparent !important;
+    flex-shrink: 0 !important;
+    gap: 2px !important;
+  }
+  .boss-link.active {
+    border-left-color: transparent !important;
+    border-bottom-color: var(--gold) !important;
+  }
+  .boss-link .soon { display: none; }
+  .boss-link .name { font-size: 10px; }
+
+  /* ── HERO ── */
+  .hero { flex-direction: column; min-height: unset; }
+  .hero-img {
+    width: 100% !important;
+    height: 150px;
+  }
+  .hero-img::after,
+  .hero.hydross .hero-img::after,
+  .hero.lurker  .hero-img::after,
+  .hero.vashj   .hero-img::after {
+    background: linear-gradient(to bottom, transparent 30%, var(--bg) 100%) !important;
+  }
+  .hero h2 { font-size: 20px; }
+  .hero-text { padding: 16px 18px 18px; }
+  .hero-order { font-size: 9px; }
+
+  /* ── BOSS BODY ── */
+  .boss-body { padding: 16px 14px 28px; }
+  h2.sec { font-size: 14px; }
+
+  /* ── INLINE GRID LAYOUTS ── */
+  [style*="grid-template-columns"] {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* ── INLINE FLEX WITH IMAGES (pack guides) ── */
+  [style*="display:flex"][style*="align-items:flex-start"] {
+    flex-wrap: wrap !important;
+  }
+  [style*="display:flex"][style*="align-items:flex-start"] > img {
+    width: 100% !important;
+    height: 160px !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+    flex-shrink: unset !important;
+  }
+
+  /* ── RESIST / ROLE GRIDS ── */
+  .resist-grid { grid-template-columns: 1fr; }
+  .roles { grid-template-columns: 1fr 1fr; }
+
+  /* ── TABLES ── */
+  table { font-size: 13px; }
+  th, td { padding: 5px 8px; }
+
+  /* ── DEBUFF LADDER ── */
+  .debuff-step { font-size: 9px; padding: 5px 2px; }
+  .debuff-step .pct { font-size: 10px; }
+  .debuff-step .sec { font-size: 8px; }
+
+  /* ── CHEAT SHEETS ── */
+  .cs-grid { grid-template-columns: 1fr !important; }
+  .cs-vashj-phases { grid-template-columns: 1fr 1fr 1fr !important; }
+  .cs-kael-phases  { grid-template-columns: 1fr 1fr 1fr !important; }
+  .cs-trash-grid   { grid-template-columns: 1fr 1fr !important; }
+  .cs-wrap { padding: 16px 12px 32px; }
+
+  /* ── COMING SOON ── */
+  .coming-soon { padding: 36px 20px; min-height: 140px; }
+  .coming-soon .cs-num { font-size: 36px; }
+  .coming-soon h2 { font-size: 18px; }
+
+}
+</style>
+
+</body>
+</html>
